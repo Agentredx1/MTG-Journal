@@ -1,0 +1,169 @@
+/* ===== Global Page Setup ===== */
+.page {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #fff;
+  color: #000;
+  max-width: 75%;       /* limit width for layout */
+  margin: 0 auto;         /* center page content horizontally */
+}
+
+.page-title {
+  font-size: 2em;
+  margin-bottom: 20px;
+  text-align: center;     /* center the heading text */
+}
+
+.section-title {
+  font-size: 1.5em;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+
+/* ===== Navigation ===== */
+.nav {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* ===== Buttons & Links ===== */
+.btn {
+  padding: 8px 16px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+.link-back {
+  text-decoration: none;
+  color: #007bff;
+  font-size: 0.9rem;
+}
+
+.link-back:hover {
+  text-decoration: underline;
+}
+
+/* ===== Forms ===== */
+.form {
+  display: flex;
+  flex-direction: column;  /* stack labels and inputs vertically */
+  align-items: center;     /* center them horizontally */
+  text-align: center;      /* center text within labels */
+  width: 100%;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.input,
+.select {
+  padding: 6px 8px;
+  margin-top: 5px;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+/* ===== Player Blocks ===== */
+.players-container {
+  display: flex;
+  flex-wrap: wrap;        /* allow wrapping */
+  gap: 10px;              /* space between blocks */
+  justify-content: center;/* center row of blocks */
+  margin-top: 10px;
+}
+
+.player-block {
+  flex: 0 0 250px;        /* fixed width per block */
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.player-title {
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+
+/* ===== Tables (Stats Page) ===== */
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.table-header {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.table-cell {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+/* Modal container */
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal image */
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  border: 4px solid #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 20px #000;
+}
+
+/* Close button */
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}

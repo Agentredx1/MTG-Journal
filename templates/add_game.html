@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/styles.css">
+  <title>Add MTG Game</title>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav">
+        <a href="/" class="btn btn-primary">Home</a>
+        <a href="/stats" class="btn btn-secondary">View Stats</a>
+    </nav>
+    <h1 class="page-title">Record a New Game</h1>
+    <form action="/add-game" method="POST" class="form">
+      <label class="form-label">Date:<br>
+        <input type="date" name="date" required class="input">
+      </label><br><br>
+
+      <label class="form-label">Number of Players:<br>
+        <input type="number" name="numPlayers" id="numPlayers" min="1" default="4" required class="input">
+      </label><br><br>
+
+      <label class="form-label">Turns:<br>
+        <input type="number" name="turns" min="1" class="input">
+      </label><br><br>
+
+      <label class="form-label">Win Condition:<br>
+        <select name="winCon" class="select">
+          <option value="Combat">Combat</option>
+          <option value="Combo">Combo</option>
+          <option value="Commander Damage">Commander Damage</option>
+          <option value="Ping/Burn">Ping/Burn</option>
+          <option value="Scoops">Scoops</option>
+        </select>
+      </label><br><br>
+
+      <h2 class="section-title">Players</h2>
+      <button type="button" onclick="addPlayer()" class="btn btn-secondary">Add Player</button><br><br>
+      <label class="form-label">Winner (use name):<br>
+        <input type="text" name="winnerName" class="input">
+      </label><br><br>
+      <div id="playersContainer" class="players-container">
+        <!-- Player input blocks will go here -->
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save Game</button>
+    </form>
+  </div>
+
+  <script src="../static/js/add_game.js"></script>
+</body>
+</html>

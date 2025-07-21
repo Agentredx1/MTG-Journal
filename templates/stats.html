@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTG Stats</title>
+  <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body class="page stats-page">
+  <h1 class="page-title">MTG Stats</h1>
+  <nav class="nav">
+    <a href="/" class="btn btn-primary">Home</a>
+    <a href="/add-game-form" class="btn btn-secondary">Add Game Data</a>
+  </nav>
+
+<!-- Player Stats -->
+<h2 class="section-title">Player Win Rates</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th class="table-header">Player Name</th>
+      <th class="table-header">Games Played</th>
+      <th class="table-header">Wins</th>
+      <th class="table-header">Win Rate (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in player_stats %}
+      <tr>
+        <td class="table-cell">
+          <a class="player-link" href="{{ url_for('player_detail', player_name=row[0]) }}">
+            {{ row[0] }}
+          </a>
+        </td>
+        <td class="table-cell">{{ row[1] }}</td>
+        <td class="table-cell">{{ row[2] }}</td>
+        <td class="table-cell">{{ row[3] }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+    <!-- Commander Stats -->
+    <h2 class="section-title">Commander Usage</h2>
+    <table class="table">
+    <thead>
+        <tr>
+        <th class="table-header">Commander</th>
+        <th class="table-header">Games Played</th>
+        <th class="table-header">Wins</th>
+        <th class="table-header">Win Rate (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in commander_stats %}
+        <tr>
+            <td class="table-cell">
+            <a href="#" class="commander-link" data-commander="{{ row[0] }}">{{ row[0] }}</a>
+            </td>
+            <td class="table-cell">{{ row[1] }}</td>
+            <td class="table-cell">{{ row[2] }}</td>
+            <td class="table-cell">{{ row[3] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+    <span class="modal-close" id="modalClose">&times;</span>
+    <img class="modal-content" id="modalImage">
+    </div>
+
+  <script src="../static/js/stats.js"></script>
+</body>
+</html>

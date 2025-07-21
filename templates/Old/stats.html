@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTG Stats</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-top: 40px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>MTG Stats</h1>
+  <p><a href="/">← Back to Add Game</a></p>
+
+  <!-- Player Stats -->
+  <h2>Player Win Rates</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Player Name</th>
+        <th>Games Played</th>
+        <th>Wins</th>
+        <th>Win Rate (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in player_stats %}
+        <tr>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1] }}</td>
+          <td>{{ row[2] }}</td>
+          <td>{{ row[3] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Commander Stats -->
+  <h2>Commander Usage</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Commander</th>
+        <th>Games Played</th>
+        <th>Wins</th>
+        <th>Win Rate (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in commander_stats %}
+        <tr>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1] }}</td>
+          <td>{{ row[2] }}</td>
+          <td>{{ row[3] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</body>
+</html>
