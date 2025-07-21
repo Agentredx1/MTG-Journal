@@ -10,7 +10,7 @@ document.querySelectorAll('.commander-link').forEach(link => {
     const commanderName = link.dataset.commander;
 
     // Encode name for URL (replace spaces etc.)
-    const imageUrl = `/static/assets/${encodeURIComponent(commanderName)}.jpg`;
+    const imageUrl = `/static/assets/commanders/${encodeURIComponent(commanderName)}.jpg`;
     modalImage.src = imageUrl;
     modal.style.display = 'flex';
   });
