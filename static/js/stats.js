@@ -7,7 +7,7 @@ const modalLinkEdhrec = document.getElementById('modalLinkEdhrec');
 
 
 // Attach click listeners to all commander links
-document.querySelectorAll('.commander-link').forEach(link => {
+document.querySelectorAll('.link[data-commander]').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     const commanderName = link.dataset.commander;
@@ -36,8 +36,10 @@ document.querySelectorAll('.commander-link').forEach(link => {
 modalClose.onclick = () => {
   modal.style.display = 'none';
   modalImage.src = '';
-  modalLink.href = '#';
-  modalLink.textContent = '';
+  modalLinkScryfall.href = '#';
+  modalLinkScryfall.textContent = '';
+  modalLinkEdhrec.href = '#';
+  modalLinkEdhrec.textContent = '';
 };
 
 // Close when clicking outside image
@@ -45,8 +47,10 @@ modal.onclick = (e) => {
   if (e.target === modal) {
     modal.style.display = 'none';
     modalImage.src = '';
-    modalLink.href = '#';
-    modalLink.textContent = '';
+    modalLinkScryfall.href = '#';
+    modalLinkScryfall.textContent = '';
+    modalLinkEdhrec.href = '#';
+    modalLinkEdhrec.textContent = '';
   }
 };
 
