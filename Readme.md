@@ -1,23 +1,42 @@
+### Requirements
+
+sqlite3 - https://www.sqlite.org/download.html  
+python & pip  
+flask - pip install flask
+
+### To run:
+Navigate to repo in CLI, I'm using powershell. Setup Gulp maybe?
+
+```PS
+$env:FLASK_APP = "app.py"
+$env:FLASK_ENV = "development"
+flask run
+```
 ### File Structure
 ```text
 MTG-Journal/
 │
-├─ app.py
-├─ queries.py
+├─ app.py                     - routes
+├─ queries.py                 - all sql queries
 ├─ mtg.db
 ├─ architecture.md
 ├─ templates/
-│   ├─ index.html
-│   ├─ add_game.html
-│   ├─ player_detail.html
-│   └─ stats.html
+│   ├─ index.html.j2          - idk a home page maybe? Show whos on a win streak? Currently blank
+│   ├─ add_game.html.j2       - form to add game data. Definitely need to sanitize this and setup approval process before going live
+│   ├─ base.html.j2           - jinja2 template used by everything else
+│   ├─ _macro.html.j2         - macros for reusable sections, currently just the color distribution chart
+│   ├─ player_detail.html.j2  - dynamic page that loads info for selected player linked in stats.html.j2
+│   └─ stats.html.j2          - overview, could also be home page. the most exciting page imo
 └─ static/
-    ├─ styles.css
-    ├─ assets/
-    │  └─ <commander>.jpg
+    ├─ styles.css             - a mess
+    ├─ assets/                
+    │  ├─ commanders/
+    │  │  └─ <commander>.jpg  - names follow lord-of-the-undead, this format plays well when linking to external sites.
+    │  └─ mana-pips/
+    │     └─ pip-<wubrg>.jpg  - only used by the color_table macro currently
     └─ js/
-       ├─ stats.js
-       └─ add_game.js
+       ├─ stats.js            - event listeners for the 'modal' or card display when looking at commanders
+       └─ add_game.js         - form logic, adding the "Player info" elements,
 ```
 
 ## Database Schema
@@ -42,8 +61,8 @@ Stores one row per player participating in a game.
 | PlayerID        | INTEGER PRIMARY KEY | Unique identifier for each player entry (auto‑incremented). |
 | GameID          | INTEGER | Foreign key referencing Games.GameID to link this player to a specific game. |
 | PlayerName      | TEXT    | Name of the player. |
-| CommanderName   | TEXT    | Name of the commander played by this player (if applicable). |
-| TurnOrder       | INTEGER | The player’s turn order in the game (e.g., 1 for first, 2 for second, etc.). |
+| CommanderName   | TEXT    | Name of the commander played by this player |
+| TurnOrder       | INTEGER | The player's turn order in the game (e.g., 1 for first, 2 for second, etc.). |
 | ColorIdentity       | TEXT | The player's commander color combination, using WUBRG |
 
 
