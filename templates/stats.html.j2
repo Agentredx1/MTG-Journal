@@ -1,78 +1,84 @@
+<!-- stats.html.j2 -->
 {% extends "base.html.j2" %}
 {% from "_macros.html.j2" import color_table %}
 
 {% block title %}Overall Stats{% endblock %}
 
 {% block content %}
-  <h1 class="page-title">MTG Stats</h1>
+  <h1 class="heading heading--primary">MTG Stats</h1>
 
-<!-- Player Stats -->
-<h2 class="section-title">Player Win Rates</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th class="table-header">Player Name</th>
-      <th class="table-header">Games Played</th>
-      <th class="table-header">Wins</th>
-      <th class="table-header">Win Rate (%)</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in player_stats %}
-      <tr>
-        <td class="table-cell">
-          <a class="player-link" href="{{ url_for('player_detail', player_name=row[0]) }}">
-            {{ row[0] }}
-          </a>
-        </td>
-        <td class="table-cell">{{ row[1] }}</td>
-        <td class="table-cell">{{ row[2] }}</td>
-        <td class="table-cell">{{ row[3] }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-
-    <!-- Commander Stats -->
-    <h2 class="section-title">Commander Usage</h2>
+  <!-- Player Stats -->
+  <section>
+    <h2 class="heading heading--secondary">Player Win Rates</h2>
     <table class="table">
-    <thead>
+      <thead>
         <tr>
-        <th class="table-header">Commander</th>
-        <th class="table-header">Games Played</th>
-        <th class="table-header">Wins</th>
-        <th class="table-header">Win Rate (%)</th>
+          <th class="table__header">Player Name</th>
+          <th class="table__header">Games Played</th>
+          <th class="table__header">Wins</th>
+          <th class="table__header">Win Rate (%)</th>
         </tr>
-    </thead>
-    <tbody>
-        {% for row in commander_stats %}
-        <tr>
-            <td class="table-cell">
-            <a href="#" class="commander-link" data-commander="{{ row[0] }}">{{ row[0] }}</a>
+      </thead>
+      <tbody>
+        {% for row in player_stats %}
+          <tr class="table__row">
+            <td class="table__cell">
+              <a class="link" href="{{ url_for('player_detail', player_name=row[0]) }}">
+                {{ row[0] }}
+              </a>
             </td>
-            <td class="table-cell">{{ row[1] }}</td>
-            <td class="table-cell">{{ row[2] }}</td>
-            <td class="table-cell">{{ row[3] }}</td>
+            <td class="table__cell">{{ row[1] }}</td>
+            <td class="table__cell">{{ row[2] }}</td>
+            <td class="table__cell">{{ row[3] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Commander Stats -->
+  <section>
+    <h2 class="heading heading--secondary">Commander Usage</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="table__header">Commander</th>
+          <th class="table__header">Games Played</th>
+          <th class="table__header">Wins</th>
+          <th class="table__header">Win Rate (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in commander_stats %}
+        <tr class="table__row">
+          <td class="table__cell">
+            <a href="#" class="link" data-commander="{{ row[0] }}">{{ row[0] }}</a>
+          </td>
+          <td class="table__cell">{{ row[1] }}</td>
+          <td class="table__cell">{{ row[2] }}</td>
+          <td class="table__cell">{{ row[3] }}</td>
         </tr>
         {% endfor %}
-    </tbody>
+      </tbody>
     </table>
+  </section>
 
-    <h2 class="section-title">Overall Color Distribution</h2>
+  <section>
+    <h2 class="heading heading--secondary">Overall Color Distribution</h2>
     {{ color_table(color_stats) }}
+  </section>
 
-    <div id="imageModal" class="modal">
-      <span class="modal-close" id="modalClose">&times;</span>
-      <div class="modal-content-wrapper">
-        <img class="modal-content" id="modalImage">
-        <p>
-          <a id="modalLinkScryfall" class="btn btn-primary" href="#" target="_blank">View on Scryfall</a>
-          <a id="modalLinkEdhrec" class="btn btn-secondary" href="#" target="_blank">View on EDHREC</a>
-        </p>
+  <!-- Modal -->
+  <div id="imageModal" class="modal">
+    <span class="modal__close" id="modalClose">&times;</span>
+    <div>
+      <img class="modal__content" id="modalImage">
+      <div class="modal__actions">
+        <a id="modalLinkScryfall" class="btn btn--primary" href="#" target="_blank">View on Scryfall</a>
+        <a id="modalLinkEdhrec" class="btn btn--secondary" href="#" target="_blank">View on EDHREC</a>
       </div>
     </div>
+  </div>
 
-    <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 {% endblock %}
