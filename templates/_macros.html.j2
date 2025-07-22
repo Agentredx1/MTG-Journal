@@ -1,24 +1,19 @@
-{% macro color_table(stats) %}
-<table class="table color-table">
-  <thead>
-    <tr>
-      <th class="table-header">Color</th>
-      <th class="table-header">Usage</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for color, percent in stats %}
-    <tr>
-      <td class="table-cell">{{ color }}</td>
-        <td class="table-cell">
-        <div class="bar-container">
-            <div class="bar-fill color-{{ color|lower }}" style="width: {{ percent ~ '%' }};"></div>
-            <span class="bar-text">{{ percent }}%</span>
-            <img class="mana-pip" src="{{ url_for('static', filename='assets/mana-pips/pip-' ~ color|lower ~ '.webp') }}" alt="{{ color }} mana pip">
-        </div>
-        </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<!-- _macros.html.j2 -->
+{% macro color_table(color_stats) %}
+<div class="color-analysis">
+  {% for color_data in color_stats %}
+    <div class="color-bar">
+      <div class="color-bar__fill color-bar__fill--{{ color_data.color_name|lower }}" 
+           style="width: {{ color_data.percentage }}%">
+      </div>
+      <div class="color-bar__text">
+        {{ color_data.color_name }}: {{ color_data.count }} ({{ color_data.percentage }}%)
+      </div>
+      {% if color_data.pip_url %}
+        <img src="{{ color_data.pip_url }}" alt="{{ color_data.color_name }} mana" class="color-bar__pip">
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
 {% endmacro %}
+

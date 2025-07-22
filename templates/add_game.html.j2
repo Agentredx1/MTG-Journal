@@ -1,45 +1,64 @@
+<!-- add_game.html.j2 -->
 {% extends "base.html.j2" %}
 
 {% block title %}{{ player_name }} Add Game{% endblock %}
 
 {% block content %}
-  <div class="page">
-    <h1 class="page-title">Record a New Game</h1>
-    <form action="/add-game" method="POST" class="form">
-      <label class="form-label">Date:<br>
-        <input type="date" name="date" required class="input">
-      </label><br><br>
+  <h1 class="heading heading--primary">Record a New Game</h1>
+  
+  <form action="/add-game" method="POST" class="form">
+    <div class="form__group">
+      <label class="form__label">
+        Date:
+        <input type="date" name="date" required class="form__input">
+      </label>
+    </div>
 
-      <label class="form-label">Number of Players:<br>
-        <input type="number" name="numPlayers" id="numPlayers" min="1" default="4" required class="input">
-      </label><br><br>
+    <div class="form__group">
+      <label class="form__label">
+        Number of Players:
+        <input type="number" name="numPlayers" id="numPlayers" min="1" value="4" required class="form__input">
+      </label>
+    </div>
 
-      <label class="form-label">Turns:<br>
-        <input type="number" name="turns" min="1" class="input">
-      </label><br><br>
+    <div class="form__group">
+      <label class="form__label">
+        Turns:
+        <input type="number" name="turns" min="1" class="form__input">
+      </label>
+    </div>
 
-      <label class="form-label">Win Condition:<br>
-        <select name="winCon" class="select">
+    <div class="form__group">
+      <label class="form__label">
+        Win Condition:
+        <select name="winCon" class="form__select">
           <option value="Combat">Combat</option>
           <option value="Combo">Combo</option>
           <option value="Commander Damage">Commander Damage</option>
           <option value="Ping/Burn">Ping/Burn</option>
           <option value="Scoops">Scoops</option>
         </select>
-      </label><br><br>
+      </label>
+    </div>
 
-      <h2 class="section-title">Players</h2>
-      <button type="button" onclick="addPlayer()" class="btn btn-secondary">Add Player</button><br><br>
-      <label class="form-label">Winner (use name):<br>
-        <input type="text" name="winnerName" class="input">
-      </label><br><br>
-      <div id="playersContainer" class="players-container">
-        <!-- Player input blocks will go here -->
-      </div>
+    <div class="form__group">
+      <h2 class="heading heading--secondary">Players</h2>
+      <button type="button" onclick="addPlayer()" class="btn btn--secondary btn--small mb-4">Add Player</button>
+      
+      <label class="form__label">
+        Winner (use name):
+        <input type="text" name="winnerName" class="form__input">
+      </label>
+    </div>
 
-      <button type="submit" class="btn btn-primary">Save Game</button>
-    </form>
-  </div>
+    <div id="playersContainer" class="players">
+      <!-- Player input blocks will go here -->
+    </div>
+
+    <div class="form__submit text-center">
+      <button type="submit" class="btn btn--primary">Save Game</button>
+    </div>
+  </form>
 
 <script src="{{ url_for('static', filename='js/add_game.js') }}"></script>
 

@@ -1,38 +1,43 @@
+<!-- index.html.j2 -->
 {% extends "base.html.j2" %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
-  <h1 class="page-title">MTG Journal</h1>
+  <h1 class="heading heading--primary">MTG Journal</h1>
 
   <section class="spotlight">
-    <h2>🏆 Top Win Rate</h2>
+    <h2 class="spotlight__title">🏆 Top Win Rate</h2>
     {% if king %}
-      <p><strong>{{ king.player_name }}</strong> with a win rate of {{ king.win_rate }}% over {{ king.games_played }} games!</p>
-      <div class="commander-images">
-        {% for img in king_imgs %}
-          <img src="{{ img }}" alt="Commander image">
-        {% endfor %}
-      </div>
-    {% else %}
-      <p>No data yet.</p>
-    {% endif %}
-  </section>
-
-<section class="spotlight">
-  <h2>🔥 Longest Win Streak</h2>
-  {% if villains and villains|length > 0 %}
-    {% for v in villains %}
-      <div class="villain-block">
-        <p><strong>{{ v.player_name }}</strong> with {{ v.streak_count }} wins in a row!</p>
-        <div class="commander-images">
-          {% for img in v.images %}
-            <img src="{{ img }}" alt="Commander image">
+      <div class="spotlight__content">
+        <p><strong>{{ king.player_name }}</strong> with a win rate of {{ king.win_rate }}% over {{ king.games_played }} games!</p>
+        <div class="commander-gallery">
+          {% for img in king_imgs %}
+            <img src="{{ img }}" alt="Commander image" class="commander-gallery__image">
           {% endfor %}
         </div>
       </div>
-    {% endfor %}
-  {% else %}
-    <p>No data yet.</p>
-  {% endif %}
-</section>
+    {% else %}
+      <p class="spotlight__content">No data yet.</p>
+    {% endif %}
+  </section>
+
+  <section class="spotlight">
+    <h2 class="spotlight__title">🔥 Longest Win Streak</h2>
+    {% if villains and villains|length > 0 %}
+      <div class="spotlight__content">
+        {% for v in villains %}
+          <div class="mb-4">
+            <p><strong>{{ v.player_name }}</strong> with {{ v.streak_count }} wins in a row!</p>
+            <div class="commander-gallery">
+              {% for img in v.images %}
+                <img src="{{ img }}" alt="Commander image" class="commander-gallery__image">
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="spotlight__content">No data yet.</p>
+    {% endif %}
+  </section>
 {% endblock %}
