@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from queries import get_player_win_rates, get_commander_stats, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats
+from queries import get_player_win_rates, get_commander_stats, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case
 import sqlite3
 
 app = Flask(__name__)
@@ -7,7 +7,26 @@ app = Flask(__name__)
 # Home page
 @app.route("/")
 def index():
-    return render_template("/index.html.j2")
+    king = get_top_win_rate()
+    king_imgs = get_recent_commanders(king["player_name"]) if king else []
+    villains_raw = get_longest_win_streak()
+    villains = []
+    for v in villains_raw:
+        imgs = []
+        for c in v["commanders"][:3]:  # limit to 3
+            if c:  # skip empty
+                imgs.append(f"/static/assets/commanders/{to_kebab_case(c)}.jpg")
+        villains.append({
+            "player_name": v["player_name"],
+            "streak_count": v["streak_count"],
+            "images": imgs
+        })
+    return render_template(
+        "index.html.j2",
+        king=king,
+        king_imgs=king_imgs,
+        villains=villains
+    )
 
 # Add Game Form
 @app.route("/add-game-form")

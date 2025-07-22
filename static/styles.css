@@ -220,6 +220,37 @@
   width: 20px;
 }
 
+.spotlight {
+  margin: 20px 0;
+  padding: 20px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+}
+.spotlight h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+.spotlight p {
+  font-size: 1.2em;
+}
+
+.commander-images {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.commander-images img {
+  width: 80px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+
+
 /* Color-specific bar fills */
 .color-w { background: #f8f8f0; border-right: 1px solid #ccc; } /* White */
 .color-u { background: #4ea3ff; } /* Blue */
