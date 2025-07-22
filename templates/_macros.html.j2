@@ -1,0 +1,24 @@
+{% macro color_table(stats) %}
+<table class="table color-table">
+  <thead>
+    <tr>
+      <th class="table-header">Color</th>
+      <th class="table-header">Usage</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for color, percent in stats %}
+    <tr>
+      <td class="table-cell">{{ color }}</td>
+        <td class="table-cell">
+        <div class="bar-container">
+            <div class="bar-fill color-{{ color|lower }}" style="width: {{ percent ~ '%' }};"></div>
+            <span class="bar-text">{{ percent }}%</span>
+            <img class="mana-pip" src="{{ url_for('static', filename='assets/mana-pips/pip-' ~ color|lower ~ '.webp') }}" alt="{{ color }} mana pip">
+        </div>
+        </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}

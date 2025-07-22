@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from queries import get_player_win_rates, get_commander_stats, get_player_detail_stats, get_player_commanders, get_player_color_stats
+from queries import get_player_win_rates, get_commander_stats, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats
 import sqlite3
 
 app = Flask(__name__)
@@ -7,12 +7,12 @@ app = Flask(__name__)
 # Home page
 @app.route("/")
 def index():
-    return render_template("/index.html")
+    return render_template("/index.html.j2")
 
 # Add Game Form
 @app.route("/add-game-form")
 def add_game_form():
-    return render_template("/add_game.html")
+    return render_template("/add_game.html.j2")
 
 # Add Game to SQL DB, form submit
 @app.route("/add-game", methods=["POST"])
@@ -55,9 +55,11 @@ def add_game():
 def stats():
     player_stats = get_player_win_rates()
     commander_stats = get_commander_stats()
-    return render_template("stats.html",
+    color_stats = get_overall_color_stats()
+    return render_template("stats.html.j2",
                            player_stats=player_stats,
-                           commander_stats=commander_stats)
+                           commander_stats=commander_stats,
+                           color_stats=color_stats)
 
 @app.route('/player/<player_name>')
 def player_detail(player_name):
@@ -68,7 +70,7 @@ def player_detail(player_name):
         # handle case where player not found
         return f"No stats found for {player_name}", 404
     return render_template(
-        'player_detail.html',
+        'player_detail.html.j2',
         player_name=player_name,
         stats=stats,
         commanders=commanders,

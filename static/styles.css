@@ -167,3 +167,126 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+.modal-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #00f;
+  text-decoration: underline;
+}
+.modal-link:hover {
+  color: #66f;
+}
+
+.modal-content-wrapper p a {
+  margin: 0 0.5rem;
+}
+
+/* Container for each bar + pip */
+.bar-container {
+  position: relative;
+  background: #e0e0e0; /* light grey background for unused portion */
+  height: 24px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding-right: 40px; /* space for pip image */
+  margin: 4px 0;
+}
+
+/* Colored fill */
+.bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Text overlay */
+.bar-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  color: #000;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Pip image */
+.mana-pip {
+  position: absolute;
+  right: 8px;
+  height: 20px;
+  width: 20px;
+}
+
+/* Color-specific bar fills */
+.color-w { background: #f8f8f0; border-right: 1px solid #ccc; } /* White */
+.color-u { background: #4ea3ff; } /* Blue */
+.color-b { background: #444; }    /* Black */
+.color-r { background: #e74c3c; } /* Red */
+.color-g { background: #27ae60; } /* Green */
+
+@media (prefers-color-scheme: dark) {
+  body,
+  .page {
+    background-color: #121212; /* dark background */
+    color: #e0e0e0;            /* light text */
+  }
+
+  .page-title,
+  .section-title {
+    color: #f0f0f0; /* brighten titles */
+  }
+
+  .table {
+    background-color: #1e1e1e;
+    color: #fff;
+    border-color: #333;
+  }
+
+  .table-header {
+    background-color: #2a2a2a;
+    border: 1px solid #444; /* override light borders */
+  }
+
+  .table-cell {
+    border: 1px solid #444;
+  }
+
+  .player-link,
+  .commander-link {
+    color: #4ea3ff; /* links stand out */
+  }
+
+  .player-link:hover,
+  .commander-link:hover {
+    color: #66b3ff;
+  }
+
+  .bar-container {
+    background: #333; /* dark container */
+  }
+
+  .bar-text {
+    color: #fff;
+    text-shadow: 0 0 3px #000; /* ensure readability */
+  }
+
+  /* Optional: pip background if they appear harsh on dark */
+  .mana-pip {
+    filter: drop-shadow(0 0 3px rgba(255,255,255,0.3));
+  }
+
+  /* Dark mode modal tweaks */
+  .modal-content {
+    border: 4px solid #444;
+    box-shadow: 0 0 20px #000;
+  }
+
+  /* Optional: dark mode for player blocks if used */
+  .player-block {
+    background-color: #1f1f1f;
+    border-color: #444;
+  }
+}

@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MTG Stats</title>
-  <link rel="stylesheet" href="../static/styles.css">
-</head>
-<body class="page stats-page">
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import color_table %}
+
+{% block title %}Overall Stats{% endblock %}
+
+{% block content %}
   <h1 class="page-title">MTG Stats</h1>
-  <nav class="nav">
-    <a href="/" class="btn btn-primary">Home</a>
-    <a href="/add-game-form" class="btn btn-secondary">Add Game Data</a>
-  </nav>
 
 <!-- Player Stats -->
 <h2 class="section-title">Player Win Rates</h2>
@@ -66,12 +59,20 @@
     </tbody>
     </table>
 
-    <!-- Modal -->
+    <h2 class="section-title">Overall Color Distribution</h2>
+    {{ color_table(color_stats) }}
+
     <div id="imageModal" class="modal">
-    <span class="modal-close" id="modalClose">&times;</span>
-    <img class="modal-content" id="modalImage">
+      <span class="modal-close" id="modalClose">&times;</span>
+      <div class="modal-content-wrapper">
+        <img class="modal-content" id="modalImage">
+        <p>
+          <a id="modalLinkScryfall" class="btn btn-primary" href="#" target="_blank">View on Scryfall</a>
+          <a id="modalLinkEdhrec" class="btn btn-secondary" href="#" target="_blank">View on EDHREC</a>
+        </p>
+      </div>
     </div>
 
-  <script src="../static/js/stats.js"></script>
-</body>
-</html>
+    <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+
+{% endblock %}

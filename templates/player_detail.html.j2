@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <title>{{ player_name }} Stats</title>
-</head>
-<body class="page">
-    <nav class="nav">
-        <a href="/" class="btn btn-primary">Home</a>
-        <a href="/stats" class="btn btn-secondary">View Stats</a>
-        <a href="/add-game-form" class="btn btn-secondary">Add Game Data</a>
-    </nav>
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import color_table %}
+
+{% block title %}{{ player_name }} Stats{% endblock %}
+
+{% block content %}
   <h1 class="page-title">{{ player_name }}'s Stats</h1>
 
   <h2 class="section-title">Overall</h2>
@@ -42,21 +34,5 @@
   </table>
 
   <h2>Most Played Colors for {{ player_name }}</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Color Identity</th>
-      <th>Games Played</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for color, count in color_stats %}
-    <tr>
-      <td>{{ color }}</td>
-      <td>{{ count }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-</body>
-</html>
+  {{ color_table(color_stats) }}
+{% endblock %}

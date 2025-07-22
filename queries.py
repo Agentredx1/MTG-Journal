@@ -105,6 +105,41 @@ def get_player_commanders(player_name):
             for r in rows
         ]
 
+def get_overall_color_stats():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT ColorIdentity
+        FROM Players
+    """)
+    rows = c.fetchall()
+    conn.close()
+
+    total_games = len(rows)
+    if total_games == 0:
+        return []
+
+    color_counter = Counter()
+
+    for (identity,) in rows:
+        if identity:
+            for letter in identity:
+                color_counter[letter] += 1
+
+    # Convert to percentage
+    color_percentages = {
+        color: round((count / total_games) * 100, 2)
+        for color, count in color_counter.items()
+    }
+
+    # Define fixed WUBRG order
+    wubrg_order = ['W', 'U', 'B', 'R', 'G']
+
+    # Build sorted list in WUBRG order, even if some are missing
+    sorted_stats = [(color, color_percentages.get(color, 0.0)) for color in wubrg_order]
+
+    return sorted_stats
+
 def get_player_color_stats(player_name):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -134,6 +169,7 @@ def get_player_color_stats(player_name):
         for color, count in color_counter.items()
     }
 
-    # Sort by percentage descending
-    sorted_stats = sorted(color_percentages.items(), key=lambda x: x[1], reverse=True)
+    wubrg_order = ['W', 'U', 'B', 'R', 'G']
+    # Build sorted list in WUBRG order, even if some are missing
+    sorted_stats = [(color, color_percentages.get(color, 0.0)) for color in wubrg_order]
     return sorted_stats

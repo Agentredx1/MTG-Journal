@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <title>{% block title %}MTG Tracker{% endblock %}</title>
+</head>
+<body class="page">
+  <nav class="nav">
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Home</a>
+    <a href="{{ url_for('stats') }}" class="btn btn-secondary">View Stats</a>
+    <a href="{{ url_for('add_game_form') }}" class="btn btn-secondary">Add Game Data</a>
+  </nav>
+
+  <main>
+    {% block content %}
+    <!-- default content if none provided -->
+    {% endblock %}
+  </main>
+
+  <footer>
+    <hr>
+    <p>&copy; 2025 MTG Tracker</p>
+  </footer>
+</body>
+</html>
