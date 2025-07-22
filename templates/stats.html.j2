@@ -1,6 +1,6 @@
 <!-- stats.html.j2 -->
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import color_table %}
+{% from "_macros.html.j2" import color_table, commander_modal %}
 
 {% block title %}Overall Stats{% endblock %}
 
@@ -68,17 +68,7 @@
     {{ color_table(color_stats) }}
   </section>
 
-  <!-- Modal -->
-  <div id="imageModal" class="modal">
-    <span class="modal__close" id="modalClose">&times;</span>
-    <div>
-      <img class="modal__content" id="modalImage">
-      <div class="modal__actions">
-        <a id="modalLinkScryfall" class="btn btn--primary" href="#" target="_blank">View on Scryfall</a>
-        <a id="modalLinkEdhrec" class="btn btn--secondary" href="#" target="_blank">View on EDHREC</a>
-      </div>
-    </div>
-  </div>
+  {{ commander_modal() }}
 
-  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/commander-modal.js') }}"></script>
 {% endblock %}

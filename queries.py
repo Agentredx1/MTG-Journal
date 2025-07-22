@@ -227,52 +227,41 @@ def get_longest_win_streak() -> List[Dict[str, Any]]:
         {
             "player_name": player,
             "streak_count": data["streak_count"],
-            "commanders": data["commanders"]
+            "commanders": [
+                {
+                    "name": cmd,
+                    "img": f"/static/assets/commanders/{to_kebab_case(cmd)}.jpg"
+                }
+                for cmd in data["commanders"]
+            ]
         }
         for player, data in streaks.items()
         if data["streak_count"] == max_streak
     ]
-
-
-    """
-    Get top performing players by various metrics
-    
-    Args:
-        metric: 'win_rate', 'games_played', or 'wins'
-        min_games: Minimum games played to qualify
-        limit: Number of results to return
-    """
-    results = get_win_rate_stats("p.PlayerName")
-    filtered = [r for r in results if r["games_played"] >= min_games]
-    
-    if not filtered:
-        return []
-    
-    # Sort by the specified metric
-    sort_key = {
-        "win_rate": lambda x: x["win_rate"],
-        "games_played": lambda x: x["games_played"], 
-        "wins": lambda x: x["wins"]
-    }.get(metric, lambda x: x["win_rate"])
-    
-    sorted_results = sorted(filtered, key=sort_key, reverse=True)
-    return sorted_results[:limit]
 
 def get_top_win_rate(min_games: int = 5) -> Optional[Dict[str, Any]]:
     """Get player with highest win rate (backwards compatibility)"""
     results = get_top_performers("win_rate", min_games, 1)
     return results[0] if results else None
 
-def to_kebab_case(name: str) -> str:
-    """Convert name to kebab-case for file paths"""
+def to_kebab_case(input_data) -> str:
+    # Handle different input types
+    if isinstance(input_data, str):
+        name = input_data
+    elif isinstance(input_data, dict) and 'name' in input_data:
+        name = input_data['name']
+    else:
+        raise ValueError(f"Invalid input type. Expected str or dict with 'name' key, got {type(input_data)}")
+    
+    # Convert to kebab-case
     name = name.lower()
     name = re.sub(r'[^a-z0-9\s]', '', name)
     name = name.strip()
     name = re.sub(r'\s+', '-', name)
     return name
 
-def get_recent_commanders(player_name: str, limit: int = 3) -> List[str]:
-    """Get recent commander image URLs for a player"""
+def get_recent_commanders(player_name: str, limit: int = 3) -> List[Dict[str, str]]:
+    """Get recent commander data for a player"""
     sql = """
         SELECT DISTINCT p.CommanderName
         FROM Players p
@@ -282,7 +271,7 @@ def get_recent_commanders(player_name: str, limit: int = 3) -> List[str]:
         LIMIT ?
     """
     
-    results = db.execute_query(sql, (player_name, limit * 2))  # Get extra to account for duplicates
+    results = db.execute_query(sql, (player_name, limit * 2))
     
     commanders = []
     seen = set()
@@ -290,7 +279,10 @@ def get_recent_commanders(player_name: str, limit: int = 3) -> List[str]:
     for (commander_name,) in results:
         if commander_name and commander_name not in seen:
             seen.add(commander_name)
-            commanders.append(f"/static/assets/commanders/{to_kebab_case(commander_name)}.jpg")
+            commanders.append({
+                "name": commander_name,
+                "img": f"/static/assets/commanders/{to_kebab_case(commander_name)}.jpg"
+            })
             if len(commanders) == limit:
                 break
     
