@@ -114,19 +114,30 @@ def get_color_stats(where_clause: str = "", params: tuple = ()) -> List[Tuple[st
     total_games = len(rows)
     
     if total_games == 0:
-        return [(color, 0.0) for color in ['W', 'U', 'B', 'R', 'G']]
-    
-    # Count color occurrences
+        return [
+            {
+                "color_name": color,
+                "count": 0,
+                "percentage": 0.0,
+                "pip_url": f"/static/assets/mana-pips/pip-{color.lower()}.webp",
+            }
+            for color in ['W', 'U', 'B', 'R', 'G']
+        ]
+
     color_counter = Counter()
     for (identity,) in rows:
         if identity:
             for letter in identity:
                 color_counter[letter] += 1
-    
-    # Convert to percentages in WUBRG order
+
     wubrg_order = ['W', 'U', 'B', 'R', 'G']
     return [
-        (color, round((color_counter.get(color, 0) / total_games) * 100, 2))
+        {
+            "color_name": color,
+            "count": color_counter.get(color, 0),
+            "percentage": round((color_counter.get(color, 0) / total_games) * 100, 2),
+            "pip_url": f"/static/assets/mana-pips/pip-{color.lower()}.webp",
+        }
         for color in wubrg_order
     ]
 
