@@ -17,3 +17,16 @@
 </div>
 {% endmacro %}
 
+{% macro commander_modal(modal_id="imageModal") %}
+<div id="{{ modal_id }}" class="modal">
+  <span class="modal__close" id="{{ modal_id }}Close">&times;</span>
+  <div>
+    <img class="modal__content" id="{{ modal_id }}Image">
+    <div class="modal__actions">
+      <a id="{{ modal_id }}LinkScryfall" class="btn btn--primary" href="#" target="_blank">View on Scryfall</a>
+      <a id="{{ modal_id }}LinkEdhrec" class="btn btn--secondary" href="#" target="_blank">View on EDHREC</a>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+

@@ -12,14 +12,17 @@ def index():
     villains_raw = get_longest_win_streak()
     villains = []
     for v in villains_raw:
-        imgs = []
+        commanders = []
         for c in v["commanders"][:3]:  # limit to 3
             if c:  # skip empty
-                imgs.append(f"/static/assets/commanders/{to_kebab_case(c)}.jpg")
+                commanders.append({
+                    "name": c["name"],  # Extract the name from the commander object
+                    "img": f"/static/assets/commanders/{to_kebab_case(c['name'])}.jpg"
+                })
         villains.append({
             "player_name": v["player_name"],
             "streak_count": v["streak_count"],
-            "images": imgs
+            "commanders": commanders
         })
     return render_template(
         "index.html.j2",
