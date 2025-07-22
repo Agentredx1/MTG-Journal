@@ -266,7 +266,7 @@ def get_top_win_rate(min_games: int = 5) -> Optional[Dict[str, Any]]:
 def to_kebab_case(name: str) -> str:
     """Convert name to kebab-case for file paths"""
     name = name.lower()
-    name = re.sub(r'[^a-z0-9\s]', '', name)
+    name = re.sub(r'[^a-z0-9\s-]', '', name)
     name = name.strip()
     name = re.sub(r'\s+', '-', name)
     return name

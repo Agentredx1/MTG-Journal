@@ -57,7 +57,7 @@ modal.onclick = (e) => {
 function toKebabCase(name) {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')   // remove commas, apostrophes, etc.
+    .replace(/[^a-z0-9\s-]/g, '')   // remove commas, apostrophes, etc.
     .trim()
     .replace(/\s+/g, '-');         // replace spaces with hyphens
 }
