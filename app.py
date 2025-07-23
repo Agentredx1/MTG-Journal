@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from queries import get_player_win_rates, get_commander_stats, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case
+from queries import get_player_win_rates, get_player_win_rates_filtered, get_commander_stats, get_commander_stats_filtered, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case
 import sqlite3
 
 app = Flask(__name__)
@@ -75,8 +75,15 @@ def add_game():
 
 @app.route("/stats")
 def stats():
-    player_stats = get_player_win_rates()
-    commander_stats = get_commander_stats()
+    # PLAYER WIN RATE FILTER TOGGLE:
+    # - Use get_player_win_rates_filtered() to show only players with wins > 0 (less clutter)
+    # - Use get_player_win_rates() to show all players including those with 0 wins (complete data)
+    # Change the function call below to toggle between filtered/unfiltered results
+    player_stats = get_player_win_rates_filtered()  # FILTERED: Only players with wins
+    # player_stats = get_player_win_rates()         # UNFILTERED: All players
+    
+    #commander_stats = get_commander_stats()
+    commander_stats = get_commander_stats_filtered()
     color_stats = get_overall_color_stats()
     return render_template("stats.html.j2",
                            player_stats=player_stats,

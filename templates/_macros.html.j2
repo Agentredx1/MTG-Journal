@@ -17,6 +17,35 @@
 </div>
 {% endmacro %}
 
+{% macro commander_table(commanders, clickable=false) %}
+<table class="table">
+  <thead>
+    <tr>
+      <th class="table__header">Commander</th>
+      <th class="table__header">Games Played</th>
+      <th class="table__header">Wins</th>
+      <th class="table__header">Win Rate (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for commander in commanders %}
+    <tr class="table__row">
+      <td class="table__cell">
+        {% if clickable %}
+          <a href="#" class="link" data-commander="{{ commander.name }}">{{ commander.name }}</a>
+        {% else %}
+          {{ commander.name }}
+        {% endif %}
+      </td>
+      <td class="table__cell">{{ commander.games_played }}</td>
+      <td class="table__cell">{{ commander.wins }}</td>
+      <td class="table__cell">{{ commander.win_rate }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
 {% macro commander_modal(modal_id="imageModal") %}
 <div id="{{ modal_id }}" class="modal">
   <span class="modal__close" id="{{ modal_id }}Close">&times;</span>

@@ -1,6 +1,6 @@
 <!-- player_detail.html.j2 -->
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import color_table %}
+{% from "_macros.html.j2" import color_table, commander_table, commander_modal %}
 
 {% block title %}{{ player_name }} Stats{% endblock %}
 
@@ -24,30 +24,15 @@
 
   <section>
     <h2 class="heading heading--secondary">Commanders Played</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th class="table__header">Commander</th>
-          <th class="table__header">Games Played</th>
-          <th class="table__header">Wins</th>
-          <th class="table__header">Win Rate (%)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in commanders %}
-        <tr class="table__row">
-          <td class="table__cell">{{ c.name }}</td>
-          <td class="table__cell">{{ c.games_played }}</td>
-          <td class="table__cell">{{ c.wins }}</td>
-          <td class="table__cell">{{ c.win_rate }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {{ commander_table(commanders, clickable=true) }}
   </section>
 
   <section class="color-analysis">
     <h2 class="heading heading--secondary">Most Played Colors for {{ player_name }}</h2>
     {{ color_table(color_stats) }}
   </section>
+
+  {{ commander_modal() }}
+
+  <script src="{{ url_for('static', filename='js/commander-modal.js') }}"></script>
 {% endblock %}

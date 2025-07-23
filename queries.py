@@ -73,22 +73,83 @@ def get_win_rate_stats(group_by: str, where_clause: str = "", params: tuple = ()
     ]
 
 def get_player_win_rates() -> List[Tuple]:
-    """Get win rates for all players (original format for backwards compatibility)"""
+    """
+    Get win rates for all players in legacy tuple format.
+    
+    Returns:
+        List[Tuple]: List of tuples containing (player_name, games_played, wins, win_rate)
+    """
     results = get_win_rate_stats("p.PlayerName")
     return [(r["name"], r["games_played"], r["wins"], r["win_rate"]) for r in results]
 
-def get_commander_stats() -> List[Tuple]:
-    """Get win rates for all commanders (original format for backwards compatibility)"""
+def get_player_win_rates_filtered() -> List[Tuple]:
+    """
+    Get win rates for players with at least 1 win (non-zero win rate).
+    
+    TEMPORARY FUNCTION: This filters out players with 0 wins to reduce clutter
+    when there's limited data. Once more games are played, switch back to 
+    get_player_win_rates() for complete player statistics.
+    
+    TO ENABLE: Change stats route in app.py to use this function
+    TO DISABLE: Change stats route back to get_player_win_rates()
+    
+    Returns:
+        List[Tuple]: List of tuples containing (player_name, games_played, wins, win_rate)
+                    for players with wins > 0
+    """
+    results = get_win_rate_stats("p.PlayerName")
+    return [
+        (r["name"], r["games_played"], r["wins"], r["win_rate"])
+        for r in results
+        if r["win_rate"] != 0
+    ]
+
+def get_commander_stats() -> List[Dict[str, Any]]:
+    """
+    Get win rates for all commanders in dictionary format.
+    
+    Returns:
+        List[Dict[str, Any]]: List of dictionaries containing commander stats
+    """
+    return get_win_rate_stats("p.CommanderName")
+
+def get_commander_stats_filtered() -> List[Dict[str, Any]]:
+    """
+    Get win rates for all commanders in dictionary format. Filtered as to not return any with win rate = 0
+    
+    Returns:
+        List[Dict[str, Any]]: List of dictionaries containing commander stats, no win rate of 0
+    """
     results = get_win_rate_stats("p.CommanderName")
-    return [(r["name"], r["games_played"], r["wins"], r["win_rate"]) for r in results]
+    return [
+        r
+        for r in results
+        if r["win_rate"] != 0
+    ]
 
 def get_player_detail_stats(player_name: str) -> Optional[Dict[str, Any]]:
-    """Get overall stats for a specific player"""
+    """
+    Get overall statistics for a specific player.
+    
+    Args:
+        player_name: Name of the player to get stats for
+        
+    Returns:
+        Optional[Dict[str, Any]]: Dictionary containing player stats or None if player not found
+    """
     results = get_win_rate_stats("p.PlayerName", "WHERE p.PlayerName = ?", (player_name,))
     return results[0] if results else None
 
 def get_player_commanders(player_name: str) -> List[Dict[str, Any]]:
-    """Get commander stats for a specific player"""
+    """
+    Get commander statistics for a specific player.
+    
+    Args:
+        player_name: Name of the player to get commander stats for
+        
+    Returns:
+        List[Dict[str, Any]]: List of dictionaries containing commander stats
+    """
     return get_win_rate_stats(
         "p.CommanderName", 
         "WHERE p.PlayerName = ?", 
@@ -142,11 +203,24 @@ def get_color_stats(where_clause: str = "", params: tuple = ()) -> List[Tuple[st
     ]
 
 def get_overall_color_stats() -> List[Tuple[str, float]]:
-    """Get color distribution across all games"""
+    """
+    Get color identity distribution across all games.
+    
+    Returns:
+        List[Dict[str, Any]]: List of color statistics with counts and percentages
+    """
     return get_color_stats()
 
 def get_player_color_stats(player_name: str) -> List[Tuple[str, float]]:
-    """Get color distribution for a specific player"""
+    """
+    Get color identity distribution for a specific player.
+    
+    Args:
+        player_name: Name of the player to get color stats for
+        
+    Returns:
+        List[Dict[str, Any]]: List of color statistics with counts and percentages
+    """
     return get_color_stats("WHERE PlayerName = ?", (player_name,))
 
 def get_game_history(where_clause: str = "", params: tuple = (), limit: int = None) -> List[Dict[str, Any]]:
@@ -183,9 +257,13 @@ def get_game_history(where_clause: str = "", params: tuple = (), limit: int = No
 
 def calculate_win_streaks(games: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     """
-    Calculate win streaks from a list of games
+    Calculate win streaks from a chronologically ordered list of games.
     
-    Returns dict mapping player names to their streak info
+    Args:
+        games: List of game dictionaries with winner_name and commander_name keys
+        
+    Returns:
+        Dict[str, Dict[str, Any]]: Dictionary mapping player names to their streak info
     """
     streaks = {}
     current_player = None
@@ -214,7 +292,12 @@ def calculate_win_streaks(games: List[Dict[str, Any]]) -> Dict[str, Dict[str, An
     return streaks
 
 def get_longest_win_streak() -> List[Dict[str, Any]]:
-    """Get players with the longest win streak"""
+    """
+    Get all players who are tied for the longest win streak.
+    
+    Returns:
+        List[Dict[str, Any]]: List of players with their streak count and commanders used
+    """
     games = get_game_history()
     streaks = calculate_win_streaks(games)
     
@@ -240,11 +323,32 @@ def get_longest_win_streak() -> List[Dict[str, Any]]:
     ]
 
 def get_top_win_rate(min_games: int = 5) -> Optional[Dict[str, Any]]:
-    """Get player with highest win rate (backwards compatibility)"""
+    """
+    Get the player with the highest win rate (legacy function).
+    
+    Args:
+        min_games: Minimum number of games played to qualify
+        
+    Returns:
+        Optional[Dict[str, Any]]: Player with highest win rate or None if no players qualify
+    """
     results = get_top_performers("win_rate", min_games, 1)
     return results[0] if results else None
 
 def to_kebab_case(input_data) -> str:
+    """
+    Convert a string or dict with 'name' key to kebab-case format.
+    Used for generating consistent filenames from commander names.
+    
+    Args:
+        input_data: String or dictionary with 'name' key
+        
+    Returns:
+        str: Kebab-case formatted string
+        
+    Raises:
+        ValueError: If input is not a string or dict with 'name' key
+    """
     # Handle different input types
     if isinstance(input_data, str):
         name = input_data
@@ -261,7 +365,16 @@ def to_kebab_case(input_data) -> str:
     return name
 
 def get_recent_commanders(player_name: str, limit: int = 3) -> List[Dict[str, str]]:
-    """Get recent commander data for a player"""
+    """
+    Get the most recently used unique commanders for a player.
+    
+    Args:
+        player_name: Name of the player
+        limit: Maximum number of commanders to return
+        
+    Returns:
+        List[Dict[str, str]]: List of commander dictionaries with name and img keys
+    """
     sql = """
         SELECT DISTINCT p.CommanderName
         FROM Players p
@@ -290,7 +403,12 @@ def get_recent_commanders(player_name: str, limit: int = 3) -> List[Dict[str, st
 
 # Advanced query functions, currently unused/untested lol
 def get_commander_meta_analysis() -> Dict[str, Any]:
-    """Get comprehensive commander meta statistics"""
+    """
+    Get comprehensive meta-analysis of commander usage and performance.
+    
+    Returns:
+        Dict[str, Any]: Dictionary containing total commanders, most played, highest winrate, and full list
+    """
     commander_stats = get_win_rate_stats("p.CommanderName")
     
     return {
@@ -301,7 +419,16 @@ def get_commander_meta_analysis() -> Dict[str, Any]:
     }
 
 def get_player_head_to_head(player1: str, player2: str) -> Dict[str, Any]:
-    """Get head-to-head statistics between two players"""
+    """
+    Get head-to-head statistics between two specific players.
+    
+    Args:
+        player1: Name of the first player
+        player2: Name of the second player
+        
+    Returns:
+        Dict[str, Any]: Dictionary containing games played, wins for each player, and game details
+    """
     sql = """
         SELECT 
             g.GameID,
