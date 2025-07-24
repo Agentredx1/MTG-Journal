@@ -36,7 +36,7 @@ function initCommanderModal(modalId = 'imageModal') {
       modalLinkEdhrec.textContent = `View ${commanderName} on EDHREC`;
 
       // Show modal
-      modal.style.display = 'flex';
+      modal.classList.add('modal--active');
     });
   });
 
@@ -61,13 +61,13 @@ function initCommanderModal(modalId = 'imageModal') {
       modalLinkEdhrec.textContent = `View ${commanderName} on EDHREC`;
 
       // Show modal
-      modal.style.display = 'flex';
+      modal.classList.add('modal--active');
     });
   });
 
   // Close modal function
   function closeModal() {
-    modal.style.display = 'none';
+    modal.classList.remove('modal--active');
     modalImage.src = '';
     modalLinkScryfall.href = '#';
     modalLinkScryfall.textContent = '';
@@ -78,12 +78,19 @@ function initCommanderModal(modalId = 'imageModal') {
   // Close modal
   modalClose.onclick = closeModal;
 
-  // Close when clicking outside image
+  // Close when clicking outside image (on overlay)
   modal.onclick = (e) => {
-    if (e.target === modal) {
+    if (e.target === modal || e.target.classList.contains('modal__overlay')) {
       closeModal();
     }
   };
+  
+  // Add touch support for mobile devices
+  modal.addEventListener('touchstart', (e) => {
+    if (e.target === modal || e.target.classList.contains('modal__overlay')) {
+      closeModal();
+    }
+  });
 }
 
 function toKebabCase(name) {
