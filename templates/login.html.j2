@@ -1,0 +1,26 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Login - MTG Tracker{% endblock %}
+
+{% block content %}
+<div class="spotlight">
+  <h1 class="spotlight__title">Login Required</h1>
+  
+  {% if error %}
+    <div class="error-message">
+      {{ error }}
+    </div>
+  {% endif %}
+  
+  <form method="POST" class="form">
+    <div class="form__group">
+      <label for="passkey" class="form__label">Passkey:</label>
+      <input type="password" id="passkey" name="passkey" class="form__input" required>
+    </div>
+    
+    <div class="form__submit">
+      <button type="submit" class="btn btn--primary">Login</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

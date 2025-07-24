@@ -13,7 +13,13 @@
     <nav class="nav">
       <a href="{{ url_for('index') }}" class="btn btn--primary">Home</a>
       <a href="{{ url_for('stats') }}" class="btn btn--secondary">View Stats</a>
-      <a href="{{ url_for('add_game_form') }}" class="btn btn--secondary">Add Game Data</a>
+      {% if session.logged_in %}
+        <a href="{{ url_for('add_game_form') }}" class="btn btn--secondary">Add Game Data</a>
+        <a href="{{ url_for('logout') }}" class="btn btn--secondary">Logout</a>
+        <span class="nav-group-info">Group: {{ session.group_name }}</span>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn--secondary">Login</a>
+      {% endif %}
     </nav>
 
     <main>

@@ -28,6 +28,49 @@ class MTGDatabase:
 # Global database instance
 db = MTGDatabase()
 
+# Group management functions
+def get_group_by_passkey(passkey: str) -> Optional[Dict[str, Any]]:
+    """
+    Get group information by passkey for authentication.
+    
+    Args:
+        passkey: The passkey to authenticate with
+        
+    Returns:
+        Optional[Dict[str, Any]]: Group information or None if not found
+    """
+    sql = "SELECT id, group_name, passkey FROM Groups WHERE passkey = ?"
+    result = db.execute_single(sql, (passkey,))
+    
+    if result:
+        return {
+            "id": result[0],
+            "group_name": result[1], 
+            "passkey": result[2]
+        }
+    return None
+
+def get_group_by_id(group_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Get group information by ID.
+    
+    Args:
+        group_id: The group ID to look up
+        
+    Returns:
+        Optional[Dict[str, Any]]: Group information or None if not found
+    """
+    sql = "SELECT id, group_name, passkey FROM Groups WHERE id = ?"
+    result = db.execute_single(sql, (group_id,))
+    
+    if result:
+        return {
+            "id": result[0],
+            "group_name": result[1],
+            "passkey": result[2]
+        }
+    return None
+
 # Base SQL patterns for reuse
 WIN_RATE_SELECT = """
     COUNT(*) AS GamesPlayed,
@@ -43,7 +86,15 @@ FROM Players p
 JOIN Games g ON p.GameID = g.GameID
 """
 
-def get_win_rate_stats(group_by: str, where_clause: str = "", params: tuple = (), order_by: str = "WinRatePercent DESC") -> List[Dict[str, Any]]:
+def get_group_filtered_base_join(group_id: int) -> str:
+    """Return the base join with group filtering"""
+    return f"""
+FROM Players p
+JOIN Games g ON p.GameID = g.GameID
+WHERE g.group_id = {group_id}
+"""
+
+def get_win_rate_stats(group_by: str, where_clause: str = "", params: tuple = (), order_by: str = "WinRatePercent DESC", group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Generic function to get win rate statistics grouped by any field
 
@@ -52,12 +103,22 @@ def get_win_rate_stats(group_by: str, where_clause: str = "", params: tuple = ()
         where_clause: Optional WHERE clause (e.g., "WHERE p.PlayerName = ?")
         params: Parameters for the WHERE clause
         order_by: ORDER BY clause
+        group_id: Optional group ID to filter results by group
     """
+    # Build the base join and where clause
+    if group_id is not None:
+        base_join = get_group_filtered_base_join(group_id)
+        if where_clause:
+            # If there's already a WHERE clause, add AND for group filter
+            where_clause = where_clause.replace("WHERE", "AND")
+    else:
+        base_join = BASE_JOIN
+    
     sql = f"""
     SELECT
         {group_by} AS GroupField,
         {WIN_RATE_SELECT}
-    {BASE_JOIN}
+    {base_join}
     {where_clause}
     GROUP BY {group_by}
     ORDER BY {order_by}
@@ -74,17 +135,20 @@ def get_win_rate_stats(group_by: str, where_clause: str = "", params: tuple = ()
         for row in results
     ]
 
-def get_player_win_rates() -> List[Tuple]:
+def get_player_win_rates(group_id: Optional[int] = None) -> List[Tuple]:
     """
     Get win rates for all players in legacy tuple format.
+
+    Args:
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Tuple]: List of tuples containing (player_name, games_played, wins, win_rate)
     """
-    results = get_win_rate_stats("p.PlayerName")
+    results = get_win_rate_stats("p.PlayerName", group_id=group_id)
     return [(r["name"], r["games_played"], r["wins"], r["win_rate"]) for r in results]
 
-def get_player_win_rates_filtered() -> List[Tuple]:
+def get_player_win_rates_filtered(group_id: Optional[int] = None) -> List[Tuple]:
     """
     Get win rates for players with at least 1 win (non-zero win rate).
 
@@ -95,59 +159,70 @@ def get_player_win_rates_filtered() -> List[Tuple]:
     TO ENABLE: Change stats route in app.py to use this function
     TO DISABLE: Change stats route back to get_player_win_rates()
 
+    Args:
+        group_id: Optional group ID to filter results by group
+
     Returns:
         List[Tuple]: List of tuples containing (player_name, games_played, wins, win_rate)
                     for players with wins > 0
     """
-    results = get_win_rate_stats("p.PlayerName")
+    results = get_win_rate_stats("p.PlayerName", group_id=group_id)
     return [
         (r["name"], r["games_played"], r["wins"], r["win_rate"])
         for r in results
         if r["win_rate"] != 0
     ]
 
-def get_commander_stats() -> List[Dict[str, Any]]:
+def get_commander_stats(group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Get win rates for all commanders in dictionary format.
+
+    Args:
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, Any]]: List of dictionaries containing commander stats
     """
-    return get_win_rate_stats("p.CommanderName")
+    return get_win_rate_stats("p.CommanderName", group_id=group_id)
 
-def get_commander_stats_filtered() -> List[Dict[str, Any]]:
+def get_commander_stats_filtered(group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Get win rates for all commanders in dictionary format. Filtered as to not return any with win rate = 0
+
+    Args:
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, Any]]: List of dictionaries containing commander stats, no win rate of 0
     """
-    results = get_win_rate_stats("p.CommanderName")
+    results = get_win_rate_stats("p.CommanderName", group_id=group_id)
     return [
         r
         for r in results
         if r["win_rate"] != 0
     ]
 
-def get_player_detail_stats(player_name: str) -> Optional[Dict[str, Any]]:
+def get_player_detail_stats(player_name: str, group_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
     """
     Get overall statistics for a specific player.
 
     Args:
         player_name: Name of the player to get stats for
+        group_id: Optional group ID to filter results by group
 
     Returns:
         Optional[Dict[str, Any]]: Dictionary containing player stats or None if player not found
     """
-    results = get_win_rate_stats("p.PlayerName", "WHERE p.PlayerName = ?", (player_name,))
+    results = get_win_rate_stats("p.PlayerName", "WHERE p.PlayerName = ?", (player_name,), group_id=group_id)
     return results[0] if results else None
 
-def get_player_commanders(player_name: str) -> List[Dict[str, Any]]:
+def get_player_commanders(player_name: str, group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Get commander statistics for a specific player.
 
     Args:
         player_name: Name of the player to get commander stats for
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, Any]]: List of dictionaries containing commander stats
@@ -156,22 +231,41 @@ def get_player_commanders(player_name: str) -> List[Dict[str, Any]]:
         "p.CommanderName",
         "WHERE p.PlayerName = ?",
         (player_name,),
-        "GamesPlayed DESC"
+        "GamesPlayed DESC",
+        group_id=group_id
     )
 
-def get_color_stats(where_clause: str = "", params: tuple = ()) -> List[Tuple[str, float]]:
+def get_color_stats(where_clause: str = "", params: tuple = (), group_id: Optional[int] = None) -> List[Tuple[str, float]]:
     """
     Generic function to get color identity statistics
 
     Args:
         where_clause: Optional WHERE clause to filter results
         params: Parameters for the WHERE clause
+        group_id: Optional group ID to filter results by group
     """
-    sql = f"""
+    # Build the base query with optional group filtering
+    if group_id is not None:
+        base_query = """
+        SELECT p.ColorIdentity
+        FROM Players p
+        JOIN Games g ON p.GameID = g.GameID
+        WHERE g.group_id = ?"""
+        
+        if where_clause:
+            # If there's already a WHERE clause, add AND for additional filtering
+            additional_where = where_clause.replace("WHERE", "AND")
+            sql = f"{base_query} {additional_where}"
+            params = (group_id,) + params
+        else:
+            sql = base_query
+            params = (group_id,)
+    else:
+        sql = f"""
         SELECT ColorIdentity
         FROM Players
         {where_clause}
-    """
+        """
 
     rows = db.execute_query(sql, params)
     total_games = len(rows)
@@ -204,28 +298,32 @@ def get_color_stats(where_clause: str = "", params: tuple = ()) -> List[Tuple[st
         for color in wubrg_order
     ]
 
-def get_overall_color_stats() -> List[Tuple[str, float]]:
+def get_overall_color_stats(group_id: Optional[int] = None) -> List[Tuple[str, float]]:
     """
     Get color identity distribution across all games.
+
+    Args:
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, Any]]: List of color statistics with counts and percentages
     """
-    return get_color_stats()
+    return get_color_stats(group_id=group_id)
 
-def get_player_color_stats(player_name: str) -> List[Tuple[str, float]]:
+def get_player_color_stats(player_name: str, group_id: Optional[int] = None) -> List[Tuple[str, float]]:
     """
     Get color identity distribution for a specific player.
 
     Args:
         player_name: Name of the player to get color stats for
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, Any]]: List of color statistics with counts and percentages
     """
-    return get_color_stats("WHERE PlayerName = ?", (player_name,))
+    return get_color_stats("WHERE p.PlayerName = ?", (player_name,), group_id=group_id)
 
-def get_game_history(where_clause: str = "", params: tuple = (), limit: int = None) -> List[Dict[str, Any]]:
+def get_game_history(where_clause: str = "", params: tuple = (), limit: int = None, group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Generic function to get game history with optional filtering
 
@@ -233,14 +331,29 @@ def get_game_history(where_clause: str = "", params: tuple = (), limit: int = No
         where_clause: Optional WHERE clause
         params: Parameters for the WHERE clause
         limit: Optional limit on results
+        group_id: Optional group ID to filter results by group
     """
     limit_clause = f"LIMIT {limit}" if limit else ""
+
+    # Build the base query with optional group filtering
+    if group_id is not None:
+        base_where = "WHERE g.group_id = ?"
+        if where_clause:
+            # If there's already a WHERE clause, add AND for additional filtering
+            additional_where = where_clause.replace("WHERE", "AND")
+            full_where = f"{base_where} {additional_where}"
+            params = (group_id,) + params
+        else:
+            full_where = base_where
+            params = (group_id,)
+    else:
+        full_where = where_clause
 
     sql = f"""
         SELECT g.GameID, g.Date, g.WinnerPlayerID, p.PlayerName, p.CommanderName
         FROM Games g
         JOIN Players p ON p.PlayerID = g.WinnerPlayerID
-        {where_clause}
+        {full_where}
         ORDER BY g.Date ASC, g.GameID ASC
         {limit_clause}
     """
@@ -293,14 +406,17 @@ def calculate_win_streaks(games: List[Dict[str, Any]]) -> Dict[str, Dict[str, An
 
     return streaks
 
-def get_longest_win_streak() -> List[Dict[str, Any]]:
+def get_longest_win_streak(group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Get all players who are tied for the longest win streak.
+
+    Args:
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, Any]]: List of players with their streak count and commanders used
     """
-    games = get_game_history()
+    games = get_game_history(group_id=group_id)
     streaks = calculate_win_streaks(games)
 
     if not streaks:
@@ -324,17 +440,18 @@ def get_longest_win_streak() -> List[Dict[str, Any]]:
         if data["streak_count"] == max_streak
     ]
 
-def get_top_win_rate(min_games: int = 5) -> Optional[Dict[str, Any]]:
+def get_top_win_rate(min_games: int = 5, group_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
     """
     Get the player with the highest win rate (legacy function).
 
     Args:
         min_games: Minimum number of games played to qualify
+        group_id: Optional group ID to filter results by group
 
     Returns:
         Optional[Dict[str, Any]]: Player with highest win rate or None if no players qualify
     """
-    results = get_top_performers("win_rate", min_games, 1)
+    results = get_top_performers("win_rate", min_games, 1, group_id=group_id)
     return results[0] if results else None
 
 def to_kebab_case(input_data) -> str:
@@ -366,27 +483,38 @@ def to_kebab_case(input_data) -> str:
     name = re.sub(r'\s+', '-', name)
     return name
 
-def get_recent_commanders(player_name: str, limit: int = 3) -> List[Dict[str, str]]:
+def get_recent_commanders(player_name: str, limit: int = 3, group_id: Optional[int] = None) -> List[Dict[str, str]]:
     """
     Get the most recently used unique commanders for a player.
 
     Args:
         player_name: Name of the player
         limit: Maximum number of commanders to return
+        group_id: Optional group ID to filter results by group
 
     Returns:
         List[Dict[str, str]]: List of commander dictionaries with name and img keys
     """
-    sql = """
-        SELECT DISTINCT p.CommanderName
-        FROM Players p
-        JOIN Games g ON p.GameID = g.GameID
-        WHERE p.PlayerName = ?
-        ORDER BY g.Date DESC, g.GameID DESC
-        LIMIT ?
-    """
-
-    results = db.execute_query(sql, (player_name, limit * 2))
+    if group_id is not None:
+        sql = """
+            SELECT DISTINCT p.CommanderName
+            FROM Players p
+            JOIN Games g ON p.GameID = g.GameID
+            WHERE p.PlayerName = ? AND g.group_id = ?
+            ORDER BY g.Date DESC, g.GameID DESC
+            LIMIT ?
+        """
+        results = db.execute_query(sql, (player_name, group_id, limit * 2))
+    else:
+        sql = """
+            SELECT DISTINCT p.CommanderName
+            FROM Players p
+            JOIN Games g ON p.GameID = g.GameID
+            WHERE p.PlayerName = ?
+            ORDER BY g.Date DESC, g.GameID DESC
+            LIMIT ?
+        """
+        results = db.execute_query(sql, (player_name, limit * 2))
 
     commanders = []
     seen = set()
@@ -463,7 +591,7 @@ def get_player_head_to_head(player1: str, player2: str) -> Dict[str, Any]:
         "games": results
     }
 
-def get_top_performers(metric: str = "win_rate", min_games: int = 5, limit: int = 1) -> List[Dict[str, Any]]:
+def get_top_performers(metric: str = "win_rate", min_games: int = 5, limit: int = 1, group_id: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Get top performing players by various metrics
 
@@ -471,8 +599,9 @@ def get_top_performers(metric: str = "win_rate", min_games: int = 5, limit: int 
         metric: 'win_rate', 'games_played', or 'wins'
         min_games: Minimum games played to qualify
         limit: Number of results to return
+        group_id: Optional group ID to filter results by group
     """
-    results = get_win_rate_stats("p.PlayerName")
+    results = get_win_rate_stats("p.PlayerName", group_id=group_id)
     filtered = [r for r in results if r["games_played"] >= min_games]
 
     if not filtered:
@@ -487,3 +616,57 @@ def get_top_performers(metric: str = "win_rate", min_games: int = 5, limit: int 
 
     sorted_results = sorted(filtered, key=sort_key, reverse=True)
     return sorted_results[:limit]
+
+# Group-aware game insertion functions
+def insert_game_with_group(date: str, num_players: int, turns: str, win_con: str, group_id: int) -> int:
+    """
+    Insert a new game with group association.
+    
+    Args:
+        date: Game date
+        num_players: Number of players
+        turns: Number of turns
+        win_con: Win condition description
+        group_id: ID of the group this game belongs to
+        
+    Returns:
+        int: The GameID of the inserted game
+    """
+    sql = "INSERT INTO Games (Date, NumPlayers, Turns, WinCon, group_id) VALUES (?, ?, ?, ?, ?)"
+    
+    with sqlite3.connect(db.db_path) as conn:
+        cur = conn.cursor()
+        cur.execute(sql, (date, num_players, turns, win_con, group_id))
+        return cur.lastrowid
+
+def insert_player_with_game(game_id: int, player_name: str, commander_name: str, group_id: int, turn_order: Optional[int] = None) -> int:
+    """
+    Insert a player for a specific game.
+    
+    Args:
+        game_id: ID of the game
+        player_name: Name of the player
+        commander_name: Name of the commander
+        group_id: ID of the group this player belongs to
+        turn_order: Turn order (optional)
+        
+    Returns:
+        int: The PlayerID of the inserted player
+    """
+    sql = "INSERT INTO Players (GameID, PlayerName, CommanderName, TurnOrder, group_id) VALUES (?, ?, ?, ?, ?)"
+    
+    with sqlite3.connect(db.db_path) as conn:
+        cur = conn.cursor()
+        cur.execute(sql, (game_id, player_name, commander_name, turn_order, group_id))
+        return cur.lastrowid
+
+def update_game_winner(game_id: int, winner_player_id: int):
+    """
+    Update the winner of a game.
+    
+    Args:
+        game_id: ID of the game
+        winner_player_id: PlayerID of the winner
+    """
+    sql = "UPDATE Games SET WinnerPlayerID = ? WHERE GameID = ?"
+    db.execute_query(sql, (winner_player_id, game_id))

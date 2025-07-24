@@ -4,22 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MTG-Journal is a Flask-based web application for tracking Magic: The Gathering multiplayer game statistics. Players log their games including commanders used, winners, and game details. The app provides statistics, win rates, player comparisons, and streak tracking.
+MTG-Journal is a Flask-based web application for tracking Magic: The Gathering multiplayer game statistics with group-based isolation. Multiple groups can use the same application instance, with each group having their own isolated data accessed via unique passkeys.
 
 ## Development Commands
 
 ### Running the Application
 ```bash
-# Set environment variables (PowerShell example from README)
-$env:FLASK_APP = "app.py"
-$env:FLASK_ENV = "development" 
-flask run
-
-# Alternative (Linux/Mac)
-export FLASK_APP=app.py
-export FLASK_ENV=development
+# Environment variables are set in .flaskenv
 flask run
 ```
+
+### Environment Configuration
+- `SECRET_KEY`: Flask session secret (defaults to 'your-secret-key')
+- Application uses `.flaskenv` for Flask configuration
 
 ### Dependencies
 - Python with pip
@@ -28,33 +25,54 @@ flask run
 
 ## Architecture
 
+### Group-Based Multi-Tenancy
+The application implements group-based data isolation where each group operates as an independent instance:
+- Groups authenticate via unique passkeys stored in the `Groups` table
+- All game data (Games/Players) is associated with a `group_id`
+- Session management stores current group context (`group_id`, `group_name`)
+- All queries automatically filter by the logged-in group's ID
+
 ### Database Schema
-- **Games table**: Stores game metadata (GameID, Date, NumPlayers, WinnerPlayerID, Turns, WinCon)
-- **Players table**: Stores per-game player data (PlayerID, GameID, PlayerName, CommanderName, TurnOrder, ColorIdentity)
+- **Groups table**: Group management (id, group_name, passkey)
+- **Games table**: Game metadata with group association (GameID, Date, NumPlayers, WinnerPlayerID, Turns, WinCon, group_id)
+- **Players table**: Per-game player data with group association (PlayerID, GameID, PlayerName, CommanderName, TurnOrder, ColorIdentity, group_id)
 - Foreign key relationships: Games.WinnerPlayerID → Players.PlayerID, Players.GameID → Games.GameID
 
+### Authentication & Session Management
+- `@login_required` decorator enforces authentication and group context
+- `get_current_group_id()` helper retrieves active group from session
+- Login system authenticates against Groups table using `get_group_by_passkey()`
+- Logout clears all session data (logged_in, group_id, group_name)
+
+### Query Architecture
+- `MTGDatabase` class provides centralized database access with `execute_query()` and `execute_single()` methods
+- `get_win_rate_stats()` is the core generic function supporting group filtering via optional `group_id` parameter
+- All query functions accept `group_id` parameter for data isolation
+- `get_group_filtered_base_join()` generates group-aware SQL joins
+- Game insertion uses `insert_game_with_group()` and `insert_player_with_game()` to maintain group associations
+
 ### Code Structure
-- `app.py`: Flask routes and main application logic
-- `queries.py`: Database access layer with MTGDatabase class and query functions
-- `templates/`: Jinja2 HTML templates
-  - `base.html.j2`: Base template with shared layout
-  - `_macros.html.j2`: Reusable template components (color distribution charts)
-  - Page templates: `index.html.j2`, `add_game.html.j2`, `stats.html.j2`, `player_detail.html.j2`
+- `app.py`: Flask routes with group-aware session management
+- `queries.py`: Database layer with group filtering support throughout
+- `templates/`: Jinja2 templates with group context display
+  - `base.html.j2`: Shows current group name in navigation
+  - `login.html.j2`: Group passkey authentication
+  - Page templates automatically receive group-filtered data
 - `static/`: CSS, JavaScript, and assets
-  - `assets/commanders/`: Commander images (kebab-case filenames)
-  - `assets/mana-pips/`: Color pip images
-  - `js/`: Form logic and modal interactions
+  - `assets/commanders/`: Commander images (kebab-case filenames via `to_kebab_case()`)
 
 ### Key Patterns
-- Database queries use the centralized `MTGDatabase` class with `execute_query()` and `execute_single()` methods
-- Win rate calculations use the `get_win_rate_stats()` generic function with flexible grouping
-- Color statistics use `get_color_stats()` with optional filtering
-- Commander names are converted to kebab-case for asset URLs using `to_kebab_case()`
-- Templates use Jinja2 macros for repeated UI elements
+- All route handlers call `get_current_group_id()` and pass to query functions
+- Database queries use group filtering by default when `group_id` is provided
+- Color statistics and win rate calculations respect group boundaries
+- Commander asset URLs use kebab-case conversion for consistent naming
+- Templates receive pre-filtered data, no additional group logic needed
 
 ### Route Structure
-- `/`: Homepage showing top players and win streaks
-- `/add-game-form`: Form to add new games
-- `/add-game`: POST endpoint for game submission
-- `/stats`: Overall statistics page
-- `/player/<player_name>`: Individual player detail pages
+- `/login`: Group authentication via passkey
+- `/logout`: Session cleanup
+- `/`: Homepage with group-specific top players and win streaks
+- `/add-game-form`: Game entry form
+- `/add-game`: POST endpoint with automatic group association
+- `/stats`: Group-specific statistics page
+- `/player/<player_name>`: Individual player details within group context

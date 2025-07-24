@@ -1,77 +1,110 @@
+## MTG-Journal
+
+A Flask-based web application for tracking Magic: The Gathering multiplayer game statistics with group-based isolation. Multiple groups can use the same application instance, with each group having their own isolated data accessed via unique passkeys.
+
 ### Requirements
 
-sqlite3 - https://www.sqlite.org/download.html  
-python & pip  
-flask - pip install flask
+- Python 3.x with pip
+- Flask: `pip install flask`
+- SQLite3 (included with Python)
 
-### To run:
-Navigate to repo in CLI, I'm using powershell. Setup Gulp maybe?
+### Setup & Running
 
-```PS
-$env:FLASK_APP = "app.py"
-$env:FLASK_ENV = "development"
-flask run
-```
+1. **Environment Setup**: The application uses `.flaskenv` for configuration
+2. **Run the application**:
+   ```bash
+   flask run
+   ```
+
+### Group Management
+
+The application supports multiple isolated groups:
+- Each group has a unique passkey for access
+- Groups see only their own game data and statistics
+- Group information is displayed in the navigation when logged in
+### Application Features
+
+- **Group Authentication**: Login with group-specific passkeys
+- **Game Tracking**: Record MTG games with players, commanders, and outcomes
+- **Statistics**: Win rates, player comparisons, and commander performance
+- **Win Streak Tracking**: Identify players on winning streaks
+- **Color Analysis**: Commander color identity distribution
+- **Player Profiles**: Individual player statistics and commander history
+
 ### File Structure
 ```text
 MTG-Journal/
 │
-├─ app.py                     - routes
-├─ queries.py                 - all sql queries
-├─ mtg.db
-├─ architecture.md
+├─ app.py                     - Flask routes and group-aware session management
+├─ queries.py                 - Database layer with group filtering support
+├─ mtg.db                     - SQLite database
+├─ .flaskenv                  - Flask environment configuration
 ├─ templates/
-│   ├─ index.html.j2          - idk a home page maybe? Show whos on a win streak? Currently blank
-│   ├─ add_game.html.j2       - form to add game data. Definitely need to sanitize this and setup approval process before going live
-│   ├─ base.html.j2           - jinja2 template used by everything else
-│   ├─ _macro.html.j2         - macros for reusable sections, currently just the color distribution chart
-│   ├─ player_detail.html.j2  - dynamic page that loads info for selected player linked in stats.html.j2
-│   └─ stats.html.j2          - overview, could also be home page. the most exciting page imo
+│   ├─ base.html.j2           - Base template with group context display
+│   ├─ login.html.j2          - Group passkey authentication
+│   ├─ index.html.j2          - Homepage with top players and win streaks
+│   ├─ add_game.html.j2       - Game entry form
+│   ├─ stats.html.j2          - Group-specific statistics page
+│   ├─ player_detail.html.j2  - Individual player details
+│   └─ _macros.html.j2        - Reusable template components
 └─ static/
-    ├─ styles.css             - a mess
+    ├─ styles.css             - Application styling
     ├─ assets/                
-    │  ├─ commanders/
-    │  │  └─ <commander>.jpg  - names follow lord-of-the-undead, this format plays well when linking to external sites.
-    │  └─ mana-pips/
-    │     └─ pip-<wubrg>.jpg  - only used by the color_table macro currently
+    │  ├─ commanders/          - Commander images (kebab-case filenames)
+    │  └─ mana-pips/          - Color pip images
     └─ js/
-       ├─ stats.js            - event listeners for the 'modal' or card display when looking at commanders
-       └─ add_game.js         - form logic, adding the "Player info" elements,
+       ├─ stats.js            - Modal interactions for commander display
+       └─ add_game.js         - Dynamic form logic
 ```
 
 ## Database Schema
 
-### Games Table  
-Stores one row per completed game.
+The application uses a group-based multi-tenant architecture where all game data is isolated by group.
 
-| Column          | Type    | Description                                                                 |
-|-----------------|---------|-----------------------------------------------------------------------------|
-| GameID          | INTEGER PRIMARY KEY | Unique identifier for each game (auto‑incremented). |
-| Date            | TEXT    | Date the game was played (ISO string, e.g. YYYY‑MM‑DD). |
-| NumPlayers      | INTEGER | Total number of players in the game. |
-| WinnerPlayerID  | INTEGER | Foreign key referencing Players.PlayerID of the winner. Can be NULL if not set. |
-| Turns           | INTEGER | Total number of turns played. |
-| WinCon          | TEXT    | A short description of how the win was achieved. |
+### Groups Table
+Manages group authentication and isolation.
+
+| Column     | Type                | Description                                                      |
+|------------|---------------------|------------------------------------------------------------------|
+| id         | INTEGER PRIMARY KEY | Unique identifier for each group (auto-incremented)             |
+| group_name | TEXT                | Descriptive name for the group (e.g., "Wednesday Night Pod")    |
+| passkey    | TEXT                | Passkey used to authenticate and access this group's data       |
+
+### Games Table  
+Stores game metadata with group association.
+
+| Column          | Type                | Description                                                      |
+|-----------------|---------------------|------------------------------------------------------------------|
+| GameID          | INTEGER PRIMARY KEY | Unique identifier for each game (auto-incremented)              |
+| Date            | TEXT                | Date the game was played (ISO string, e.g. YYYY-MM-DD)         |
+| NumPlayers      | INTEGER             | Total number of players in the game                             |
+| WinnerPlayerID  | INTEGER             | Foreign key referencing Players.PlayerID of the winner         |
+| Turns           | INTEGER             | Total number of turns played                                    |
+| WinCon          | TEXT                | Description of how the win was achieved                         |
+| group_id        | INTEGER             | Foreign key referencing Groups.id for data isolation           |
 
 ### Players Table  
-Stores one row per player participating in a game.
+Stores per-game player data with group association.
 
-| Column          | Type    | Description                                                                 |
-|-----------------|---------|-----------------------------------------------------------------------------|
-| PlayerID        | INTEGER PRIMARY KEY | Unique identifier for each player entry (auto‑incremented). |
-| GameID          | INTEGER | Foreign key referencing Games.GameID to link this player to a specific game. |
-| PlayerName      | TEXT    | Name of the player. |
-| CommanderName   | TEXT    | Name of the commander played by this player |
-| TurnOrder       | INTEGER | The player's turn order in the game (e.g., 1 for first, 2 for second, etc.). |
-| ColorIdentity       | TEXT | The player's commander color combination, using WUBRG |
+| Column          | Type                | Description                                                      |
+|-----------------|---------------------|------------------------------------------------------------------|
+| PlayerID        | INTEGER PRIMARY KEY | Unique identifier for each player entry (auto-incremented)      |
+| GameID          | INTEGER             | Foreign key referencing Games.GameID                            |
+| PlayerName      | TEXT                | Name of the player                                              |
+| CommanderName   | TEXT                | Name of the commander played by this player                     |
+| TurnOrder       | INTEGER             | Player's turn order in the game (1 for first, 2 for second, etc.) |
+| ColorIdentity   | TEXT                | Commander color combination using WUBRG notation                |
+| group_id        | INTEGER             | Foreign key referencing Groups.id for data isolation           |
 
 
 ### Relationships  
-- **One‑to‑many:** Each game in Games can have multiple related entries in Players (via GameID).  
-- **Winner reference:** The WinnerPlayerID in Games references a specific PlayerID in Players to indicate who won.
+- **Group isolation:** All Games and Players belong to a specific Group via group_id
+- **One-to-many:** Each Game can have multiple Players (via GameID)  
+- **Winner reference:** WinnerPlayerID in Games references a specific PlayerID to indicate who won
+- **Data isolation:** All queries automatically filter by the logged-in group's ID
 
-### Notes  
-- Both primary keys (GameID and PlayerID) are INTEGER PRIMARY KEY and automatically increment in SQLite.  
-- Foreign key constraints ensure referential integrity:
-  - Deleting a Player that is referenced as a WinnerPlayerID will fail unless the winner reference is cleared.
-  - Deleting a Game requires first deleting or reassigning its Players due to the foreign key from Players.GameID.
+### Group Management
+- Each group operates as an independent instance with isolated data
+- Groups authenticate using unique passkeys stored in the Groups table
+- All game data (Games/Players) is associated with the group that created it
+- Users can only see and interact with data from their authenticated group

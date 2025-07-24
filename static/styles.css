@@ -292,6 +292,15 @@ body {
   z-index: 3;
 }
 
+.login-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
 /* Color-specific fills */
 .color-bar__fill--w {
   background: linear-gradient(90deg, #fffbeb, #fef3c7);
