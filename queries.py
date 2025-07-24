@@ -670,3 +670,25 @@ def update_game_winner(game_id: int, winner_player_id: int):
     """
     sql = "UPDATE Games SET WinnerPlayerID = ? WHERE GameID = ?"
     db.execute_query(sql, (winner_player_id, game_id))
+
+def get_commander_suggestions(query: str, group_id: int, limit: int = 10) -> List[str]:
+    """Get commander name suggestions based on partial input for the current group"""
+    if not query or len(query.strip()) < 2:
+        return []
+    
+    db = MTGDatabase()
+    search_term = f"%{query.strip()}%"
+    
+    sql = """
+        SELECT DISTINCT p.CommanderName, COUNT(*) as usage_count
+        FROM Players p
+        WHERE p.group_id = ? 
+        AND p.CommanderName LIKE ? 
+        AND p.CommanderName != ''
+        GROUP BY p.CommanderName
+        ORDER BY usage_count DESC, p.CommanderName ASC
+        LIMIT ?
+    """
+    
+    results = db.execute_query(sql, (group_id, search_term, limit))
+    return [result[0] for result in results if result[0]]

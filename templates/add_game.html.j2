@@ -6,6 +6,68 @@
 {% block content %}
   <h1 class="heading heading--primary">Record a New Game</h1>
   
+  <!-- CSV Upload Section -->
+  <div class="form-section">
+    <div class="form-section__toggle">
+      <button type="button" id="toggleCsvUpload" class="btn btn--secondary btn--small">Upload Games from CSV</button>
+    </div>
+    
+    <div id="csvUploadSection" class="csv-upload-section" style="display: none;">
+      <div class="form container--narrow">
+        <h2 class="heading heading--secondary">Upload Games from CSV</h2>
+        <p class="csv-instructions">
+          Upload a CSV file with your game data. The CSV should have the following columns:
+        </p>
+        
+        <div class="csv-format">
+          <h3 class="heading heading--tertiary">Required CSV Format:</h3>
+          <code class="csv-example">
+            Date,NumPlayers,Turns,WinCon,WinnerName,PlayerName,CommanderName,TurnOrder<br>
+            2024-01-15,4,12,Combat,Alice,Alice,Atraxa,1<br>
+            2024-01-15,4,12,Combat,Alice,Bob,Kaalia,2<br>
+            2024-01-15,4,12,Combat,Alice,Charlie,Meren,3<br>
+            2024-01-15,4,12,Combat,Alice,Alice,Atraxa,4
+          </code>
+          
+          <div class="csv-notes">
+            <h4>Notes:</h4>
+            <ul>
+              <li><strong>Date:</strong> YYYY-MM-DD format</li>
+              <li><strong>NumPlayers:</strong> Total number of players in the game</li>
+              <li><strong>Turns:</strong> Number of turns (optional, can be empty)</li>
+              <li><strong>WinCon:</strong> Win condition (Combat, Combo, Commander Damage, Ping/Burn, Scoops)</li>
+              <li><strong>WinnerName:</strong> Name of the winning player</li>
+              <li><strong>PlayerName:</strong> Individual player name for this row</li>
+              <li><strong>CommanderName:</strong> Commander used by this player (optional)</li>
+              <li><strong>TurnOrder:</strong> Turn order for this player (optional)</li>
+              <li><strong>Each game requires one row per player</strong></li>
+            </ul>
+          </div>
+        </div>
+        
+        <form action="/upload-csv" method="POST" enctype="multipart/form-data" class="csv-upload-form">
+          <div class="form__group">
+            <label class="form__label">
+              Select CSV File:
+              <input type="file" name="csvFile" accept=".csv" required class="form__input" id="csvFileInput">
+            </label>
+          </div>
+          <div class="form__submit text-center">
+            <button type="submit" class="btn btn--primary">Upload and Process CSV</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-section">
+    <div class="form-section__toggle">
+      <button type="button" id="toggleManualEntry" class="btn btn--secondary btn--small">Add Single Game Manually</button>
+    </div>
+    
+    <div id="manualEntrySection" class="manual-entry-section">
+      <h2 class="heading heading--secondary">Manual Game Entry</h2>
+  
   <form action="/add-game" method="POST" class="form">
     <div class="form__group">
       <label class="form__label">
@@ -24,7 +86,13 @@
     <div class="form__group">
       <label class="form__label">
         Turns:
-        <input type="number" name="turns" min="1" class="form__input">
+        <div class="turns-input-container">
+          <input type="number" name="turns" min="1" class="form__input" id="turnsInput">
+          <button type="button" id="turnCounterToggle" class="btn btn--secondary btn--small turn-counter-btn">
+            <span class="turn-counter-icon">🎲</span>
+            <span class="turn-counter-text">Live Counter</span>
+          </button>
+        </div>
       </label>
     </div>
 
@@ -59,7 +127,49 @@
       <button type="submit" class="btn btn--primary">Save Game</button>
     </div>
   </form>
+    </div>
+  </div>
+
+  <!-- Turn Counter Overlay -->
+  <div id="turnCounterOverlay" class="turn-counter-overlay">
+    <div class="turn-counter-modal">
+      <div class="turn-counter-header">
+        <h3 class="turn-counter-title">Turn Counter</h3>
+        <button type="button" id="turnCounterClose" class="turn-counter-close" aria-label="Close turn counter">×</button>
+      </div>
+      
+      <div class="turn-counter-display">
+        <div class="turn-counter-current">
+          <span class="turn-counter-label">Current Turn</span>
+          <span class="turn-counter-number" id="turnCounterDisplay">1</span>
+        </div>
+      </div>
+      
+      <div class="turn-counter-controls">
+        <button type="button" id="turnCounterDecrement" class="turn-counter-btn turn-counter-btn--decrement">
+          <span class="turn-counter-btn-icon">−</span>
+          <span class="turn-counter-btn-text">Previous</span>
+        </button>
+        
+        <button type="button" id="turnCounterIncrement" class="turn-counter-btn turn-counter-btn--increment">
+          <span class="turn-counter-btn-icon">+</span>
+          <span class="turn-counter-btn-text">Next Turn</span>
+        </button>
+      </div>
+      
+      <div class="turn-counter-actions">
+        <button type="button" id="turnCounterReset" class="btn btn--secondary btn--small">Reset to 1</button>
+        <button type="button" id="turnCounterSave" class="btn btn--primary">Save & Close</button>
+      </div>
+      
+      <div class="turn-counter-tips">
+        <p>💡 <strong>Tip:</strong> Keep this open while playing to track turns in real-time</p>
+      </div>
+    </div>
+  </div>
 
 <script src="{{ url_for('static', filename='js/add_game.js') }}"></script>
+<script src="{{ url_for('static', filename='js/csv_upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/turn_counter.js') }}"></script>
 
 {% endblock %}

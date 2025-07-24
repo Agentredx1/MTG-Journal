@@ -214,6 +214,454 @@ body {
   margin-top: 2rem;
 }
 
+/* ===== Autocomplete Styles ===== */
+.autocomplete-container {
+  position: relative;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 0.375rem 0.375rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+.suggestion-item {
+  padding: 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.suggestion-item:hover,
+.suggestion-item.selected {
+  background-color: #f3f4f6;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Player block styling */
+.player-block {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.player-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ===== CSV Upload Styles ===== */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section__toggle {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.csv-upload-section,
+.manual-entry-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  background-color: #f9fafb;
+}
+
+.csv-instructions {
+  margin-bottom: 1.5rem;
+  color: #6b7280;
+}
+
+.csv-format {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.csv-example {
+  display: block;
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: 1rem 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.csv-notes {
+  margin-top: 1rem;
+}
+
+.csv-notes h4 {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+}
+
+.csv-notes ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.csv-notes li {
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+}
+
+.file-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.375rem;
+}
+
+.file-info p {
+  margin: 0.25rem 0;
+  color: #0369a1;
+}
+
+.csv-preview {
+  margin-top: 1rem;
+}
+
+.csv-preview h4 {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+}
+
+.csv-preview-content {
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  border: 1px solid #e5e7eb;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* ===== Message Styles ===== */
+.message {
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.message--success {
+  background-color: #d1fae5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.message--error {
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.message--warning {
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+.message__close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  margin-left: 1rem;
+}
+
+.message__close:hover {
+  opacity: 0.7;
+}
+
+/* ===== Turn Counter Styles ===== */
+.turns-input-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.turns-input-container .form__input {
+  flex: 1;
+}
+
+.turn-counter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.turn-counter-btn--active {
+  background-color: #2563eb;
+  color: white;
+}
+
+.turn-counter-btn--saved {
+  background-color: #059669;
+  color: white;
+}
+
+.turn-counter-icon {
+  font-size: 1rem;
+}
+
+.turn-counter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.turn-counter-overlay--active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.turn-counter-modal {
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.turn-counter-overlay--active .turn-counter-modal {
+  transform: scale(1) translateY(0);
+}
+
+.turn-counter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.turn-counter-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.turn-counter-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.turn-counter-close:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.turn-counter-display {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.turn-counter-current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.turn-counter-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.turn-counter-number {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #2563eb;
+  line-height: 1;
+  min-width: 100px;
+  display: inline-block;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.turn-counter-number--reset {
+  animation: pulse 0.3s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.turn-counter-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.turn-counter-btn {
+  background-color: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.turn-counter-btn:hover:not(:disabled) {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+.turn-counter-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.turn-counter-btn--increment {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.turn-counter-btn--increment:hover:not(:disabled) {
+  background-color: #bfdbfe;
+  border-color: #2563eb;
+}
+
+.turn-counter-btn--increment-active {
+  background-color: #2563eb;
+  color: white;
+  transform: scale(0.95);
+}
+
+.turn-counter-btn--decrement {
+  background-color: #fef2f2;
+  border-color: #f87171;
+  color: #dc2626;
+}
+
+.turn-counter-btn--decrement:hover:not(:disabled) {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+}
+
+.turn-counter-btn--decrement-active {
+  background-color: #dc2626;
+  color: white;
+  transform: scale(0.95);
+}
+
+.turn-counter-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.turn-counter-btn-icon {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.turn-counter-btn-text {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.turn-counter-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.turn-counter-actions .btn {
+  flex: 1;
+}
+
+.turn-counter-tips {
+  text-align: center;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.turn-counter-tips p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
 /* ===== Player Components ===== */
 .players {
   display: flex;
@@ -638,6 +1086,101 @@ body {
   .modal__btn-text {
     padding: 0 0.5rem;
   }
+  
+  /* Autocomplete mobile styles */
+  .autocomplete-suggestions {
+    max-height: 150px;
+  }
+  
+  .suggestion-item {
+    padding: 1rem 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .player-block {
+    padding: 1rem;
+  }
+  
+  /* CSV Upload mobile styles */
+  .csv-upload-section,
+  .manual-entry-section {
+    padding: 1rem;
+  }
+  
+  .csv-format {
+    padding: 1rem;
+  }
+  
+  .csv-example {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .csv-notes ul {
+    padding-left: 1rem;
+  }
+  
+  .file-info {
+    padding: 0.75rem;
+  }
+  
+  .csv-preview-content {
+    font-size: 0.7rem;
+    padding: 0.5rem;
+  }
+  
+  .message {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .message__close {
+    align-self: flex-end;
+    margin: 0;
+  }
+  
+  /* Turn Counter mobile styles */
+  .turns-input-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .turn-counter-btn .turn-counter-text {
+    font-size: 0.8rem;
+  }
+  
+  .turn-counter-modal {
+    padding: 1.5rem;
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+  
+  .turn-counter-number {
+    font-size: 3rem;
+  }
+  
+  .turn-counter-controls {
+    gap: 0.75rem;
+  }
+  
+  .turn-counter-btn {
+    padding: 1.25rem 0.75rem;
+  }
+  
+  .turn-counter-btn-icon {
+    font-size: 1.75rem;
+  }
+  
+  .turn-counter-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .turn-counter-tips {
+    padding: 0.75rem;
+  }
 }
 
 /* ===== Dark Mode ===== */
@@ -775,5 +1318,169 @@ body {
   
   .modal__close:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Autocomplete dark mode */
+  .autocomplete-suggestions {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .suggestion-item {
+    border-color: #374151;
+    color: #e5e7eb;
+  }
+  
+  .suggestion-item:hover,
+  .suggestion-item.selected {
+    background-color: #374151;
+  }
+  
+  .player-block {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .player-title {
+    color: #f3f4f6;
+  }
+  
+  /* CSV Upload dark mode */
+  .csv-upload-section,
+  .manual-entry-section {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .csv-instructions {
+    color: #9ca3af;
+  }
+  
+  .csv-format {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  .csv-example {
+    background-color: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  .csv-notes h4 {
+    color: #f3f4f6;
+  }
+  
+  .csv-notes li {
+    color: #9ca3af;
+  }
+  
+  .file-info {
+    background-color: #1e40af;
+    border-color: #3b82f6;
+  }
+  
+  .file-info p {
+    color: #dbeafe;
+  }
+  
+  .csv-preview h4 {
+    color: #f3f4f6;
+  }
+  
+  .csv-preview-content {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  .message--success {
+    background-color: #064e3b;
+    border-color: #065f46;
+    color: #a7f3d0;
+  }
+  
+  .message--error {
+    background-color: #7f1d1d;
+    border-color: #991b1b;
+    color: #fca5a5;
+  }
+  
+  .message--warning {
+    background-color: #78350f;
+    border-color: #92400e;
+    color: #fcd34d;
+  }
+  
+  /* Turn Counter dark mode */
+  .turn-counter-modal {
+    background-color: #1f2937;
+  }
+  
+  .turn-counter-header {
+    border-color: #374151;
+  }
+  
+  .turn-counter-title {
+    color: #f3f4f6;
+  }
+  
+  .turn-counter-close {
+    color: #9ca3af;
+  }
+  
+  .turn-counter-close:hover {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+  
+  .turn-counter-label {
+    color: #9ca3af;
+  }
+  
+  .turn-counter-number {
+    color: #60a5fa;
+    text-shadow: 0 2px 4px rgba(96, 165, 250, 0.1);
+  }
+  
+  .turn-counter-btn {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  .turn-counter-btn:hover:not(:disabled) {
+    background-color: #4b5563;
+    border-color: #6b7280;
+  }
+  
+  .turn-counter-btn--increment {
+    background-color: #1e3a8a;
+    border-color: #3b82f6;
+    color: #dbeafe;
+  }
+  
+  .turn-counter-btn--increment:hover:not(:disabled) {
+    background-color: #1e40af;
+    border-color: #60a5fa;
+  }
+  
+  .turn-counter-btn--decrement {
+    background-color: #7f1d1d;
+    border-color: #ef4444;
+    color: #fecaca;
+  }
+  
+  .turn-counter-btn--decrement:hover:not(:disabled) {
+    background-color: #991b1b;
+    border-color: #f87171;
+  }
+  
+  .turn-counter-tips {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  .turn-counter-tips p {
+    color: #9ca3af;
   }
 }

@@ -1,11 +1,26 @@
-from flask import Flask, render_template, request, redirect, session, url_for
-from queries import get_player_win_rates, get_player_win_rates_filtered, get_commander_stats, get_commander_stats_filtered, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case, get_group_by_passkey, insert_game_with_group, insert_player_with_game, update_game_winner
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+from queries import get_player_win_rates, get_player_win_rates_filtered, get_commander_stats, get_commander_stats_filtered, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case, get_group_by_passkey, insert_game_with_group, insert_player_with_game, update_game_winner, get_commander_suggestions
 from functools import wraps
 import sqlite3
 import os
+import html
+import re
+import csv
+import io
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key') # This signs the sessions but really doesn't matter atm
+
+def sanitize_input(text):
+    """Sanitize user input by removing HTML tags and trimming whitespace"""
+    if not text:
+        return ""
+    # Remove HTML tags and decode HTML entities
+    text = html.escape(text.strip())
+    # Remove extra whitespace
+    text = re.sub(r'\s+', ' ', text)
+    return text
 
 def login_required(f):
     @wraps(f)
@@ -82,23 +97,31 @@ def add_game_form():
 @login_required
 def add_game():
     group_id = get_current_group_id()
-    date = request.form["date"]
+    
+    # Sanitize input data
+    date = sanitize_input(request.form["date"])
     num_players = int(request.form["numPlayers"])
-    turns = request.form.get("turns")
-    win_con = request.form.get("winCon")
-    winner_name = request.form.get("winnerName")
+    turns = sanitize_input(request.form.get("turns"))
+    win_con = sanitize_input(request.form.get("winCon"))
+    winner_name = sanitize_input(request.form.get("winnerName"))
 
-    player_names = request.form.getlist("playerName[]")
-    commander_names = request.form.getlist("commanderName[]")
+    player_names = [sanitize_input(name) for name in request.form.getlist("playerName[]")]
+    commander_names = [sanitize_input(name) for name in request.form.getlist("commanderName[]")]
     turn_orders = request.form.getlist("turnOrder[]")
+
+    # Validate required fields
+    if not date or not player_names or len(player_names) != num_players:
+        return redirect("/add-game-form?error=invalid_data")
 
     # Insert Game with group association
     game_id = insert_game_with_group(date, num_players, turns, win_con, group_id)
 
     winner_id = None
     for i, name in enumerate(player_names):
-        pid = insert_player_with_game(game_id, name, commander_names[i], group_id,
-                                      turn_orders[i] if turn_orders[i] else None)
+        commander_name = commander_names[i] if i < len(commander_names) else ""
+        turn_order = turn_orders[i] if i < len(turn_orders) and turn_orders[i] else None
+        
+        pid = insert_player_with_game(game_id, name, commander_name, group_id, turn_order)
         if name == winner_name:
             winner_id = pid
 
@@ -106,6 +129,154 @@ def add_game():
         update_game_winner(game_id, winner_id)
 
     return redirect("/add-game-form")
+
+@app.route("/api/commander-suggestions")
+@login_required
+def commander_suggestions():
+    """API endpoint for commander name auto-suggestions"""
+    query = sanitize_input(request.args.get('q', ''))
+    group_id = get_current_group_id()
+    
+    if len(query) < 2:
+        return jsonify([])
+    
+    suggestions = get_commander_suggestions(query, group_id, limit=8)
+    return jsonify(suggestions)
+
+def process_csv_games(csv_content, group_id):
+    """Process CSV content and insert games into database"""
+    games_processed = 0
+    errors = []
+    
+    try:
+        # Parse CSV content
+        csv_reader = csv.DictReader(io.StringIO(csv_content))
+        
+        required_columns = ['Date', 'NumPlayers', 'WinnerName', 'PlayerName']
+        optional_columns = ['Turns', 'WinCon', 'CommanderName', 'TurnOrder']
+        
+        # Validate headers
+        if not all(col in csv_reader.fieldnames for col in required_columns):
+            missing = [col for col in required_columns if col not in csv_reader.fieldnames]
+            return 0, [f"Missing required columns: {', '.join(missing)}"]
+        
+        # Group rows by game (same date, num_players, winner)
+        games = {}
+        for row_num, row in enumerate(csv_reader, start=2):  # Start at 2 for header
+            try:
+                # Sanitize input
+                date = sanitize_input(row['Date'].strip())
+                num_players = int(row['NumPlayers'].strip())
+                winner_name = sanitize_input(row['WinnerName'].strip())
+                player_name = sanitize_input(row['PlayerName'].strip())
+                
+                # Optional fields
+                turns = sanitize_input(row.get('Turns', '').strip()) or None
+                win_con = sanitize_input(row.get('WinCon', '').strip()) or 'Combat'
+                commander_name = sanitize_input(row.get('CommanderName', '').strip())
+                turn_order = row.get('TurnOrder', '').strip()
+                turn_order = int(turn_order) if turn_order else None
+                
+                # Validate win condition
+                valid_win_cons = ['Combat', 'Combo', 'Commander Damage', 'Ping/Burn', 'Scoops']
+                if win_con not in valid_win_cons:
+                    win_con = 'Combat'
+                
+                # Create game key
+                game_key = (date, num_players, winner_name, turns, win_con)
+                
+                if game_key not in games:
+                    games[game_key] = []
+                
+                games[game_key].append({
+                    'player_name': player_name,
+                    'commander_name': commander_name,
+                    'turn_order': turn_order
+                })
+                
+            except (ValueError, KeyError) as e:
+                errors.append(f"Row {row_num}: {str(e)}")
+                continue
+        
+        # Insert games into database
+        for (date, num_players, winner_name, turns, win_con), players in games.items():
+            try:
+                # Validate number of players matches actual players
+                if len(players) != num_players:
+                    errors.append(f"Game on {date}: Expected {num_players} players, found {len(players)}")
+                    continue
+                
+                # Insert game
+                game_id = insert_game_with_group(date, num_players, turns, win_con, group_id)
+                
+                # Insert players
+                winner_id = None
+                for player in players:
+                    pid = insert_player_with_game(
+                        game_id, 
+                        player['player_name'], 
+                        player['commander_name'], 
+                        group_id,
+                        player['turn_order']
+                    )
+                    
+                    if player['player_name'] == winner_name:
+                        winner_id = pid
+                
+                # Update winner
+                if winner_id:
+                    update_game_winner(game_id, winner_id)
+                else:
+                    errors.append(f"Game on {date}: Winner '{winner_name}' not found in player list")
+                
+                games_processed += 1
+                
+            except Exception as e:
+                errors.append(f"Game on {date}: {str(e)}")
+                continue
+        
+        return games_processed, errors
+        
+    except Exception as e:
+        return 0, [f"CSV parsing error: {str(e)}"]
+
+@app.route("/upload-csv", methods=["POST"])
+@login_required
+def upload_csv():
+    """Handle CSV file upload and processing"""
+    group_id = get_current_group_id()
+    
+    if 'csvFile' not in request.files:
+        return redirect("/add-game-form?error=no_file")
+    
+    file = request.files['csvFile']
+    if file.filename == '':
+        return redirect("/add-game-form?error=no_file")
+    
+    if not file.filename.lower().endswith('.csv'):
+        return redirect("/add-game-form?error=invalid_file_type")
+    
+    try:
+        # Read and decode file content
+        csv_content = file.read().decode('utf-8')
+        
+        # Process CSV
+        games_processed, errors = process_csv_games(csv_content, group_id)
+        
+        # Prepare result message
+        if games_processed > 0:
+            success_msg = f"Successfully processed {games_processed} games"
+            if errors:
+                error_msg = " with some errors: " + "; ".join(errors[:5])  # Limit error display
+                return redirect(f"/add-game-form?success={success_msg}&warnings={error_msg}")
+            else:
+                return redirect(f"/add-game-form?success={success_msg}")
+        else:
+            error_msg = "No games were processed. Errors: " + "; ".join(errors[:5])
+            return redirect(f"/add-game-form?error={error_msg}")
+            
+    except Exception as e:
+        return redirect(f"/add-game-form?error=Upload failed: {str(e)}")
 
 @app.route("/stats")
 @login_required
