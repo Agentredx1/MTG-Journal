@@ -1484,3 +1484,226 @@ body {
     color: #9ca3af;
   }
 }
+
+/* Life Counter Styles */
+.life-counter-section {
+  margin: 2rem 0;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.life-counter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.life-counter-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.life-counter-players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.life-counter-player {
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.life-counter-player--dead {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  opacity: 0.7;
+}
+
+.life-counter-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.life-counter-player-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.life-counter-player-life {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #059669;
+  min-width: 3rem;
+}
+
+.life-counter-player-life--low {
+  color: #dc2626;
+}
+
+.life-counter-player-life--dead {
+  color: #7f1d1d;
+}
+
+.life-counter-player-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.life-counter-btn {
+  background-color: #f3f4f6;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #374151;
+  font-weight: 500;
+}
+
+.life-counter-btn:hover:not(:disabled) {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.life-counter-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.life-counter-btn--increment {
+  background-color: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+}
+
+.life-counter-btn--increment:hover:not(:disabled) {
+  background-color: #bbf7d0;
+  border-color: #15803d;
+}
+
+.life-counter-btn--decrement {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.life-counter-btn--decrement:hover:not(:disabled) {
+  background-color: #fecaca;
+  border-color: #dc2626;
+}
+
+.life-counter-btn-icon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.life-counter-btn--increment-active {
+  background-color: #16a34a;
+  color: white;
+  transform: scale(0.95);
+}
+
+.life-counter-btn--decrement-active {
+  background-color: #dc2626;
+  color: white;
+  transform: scale(0.95);
+}
+
+/* Mobile responsive for life counter */
+@media (max-width: 768px) {
+  .life-counter-players {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .life-counter-player {
+    padding: 0.75rem;
+  }
+  
+  .life-counter-player-life {
+    font-size: 1.5rem;
+  }
+  
+  .life-counter-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .life-counter-btn-icon {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark mode for life counter */
+@media (prefers-color-scheme: dark) {
+  .life-counter-section {
+    border-color: #374151;
+  }
+  
+  .life-counter-title {
+    color: #f3f4f6;
+  }
+  
+  .life-counter-player {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  .life-counter-player--dead {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+  }
+  
+  .life-counter-player-label {
+    color: #9ca3af;
+  }
+  
+  .life-counter-btn {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    color: #e5e7eb;
+  }
+  
+  .life-counter-btn:hover:not(:disabled) {
+    background-color: #6b7280;
+    border-color: #9ca3af;
+  }
+  
+  .life-counter-btn--increment {
+    background-color: #166534;
+    border-color: #16a34a;
+    color: #dcfce7;
+  }
+  
+  .life-counter-btn--increment:hover:not(:disabled) {
+    background-color: #15803d;
+    border-color: #22c55e;
+  }
+  
+  .life-counter-btn--decrement {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+    color: #fecaca;
+  }
+  
+  .life-counter-btn--decrement:hover:not(:disabled) {
+    background-color: #991b1b;
+    border-color: #ef4444;
+  }
+}

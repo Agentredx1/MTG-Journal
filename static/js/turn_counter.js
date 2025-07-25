@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // State
     let currentTurn = 1;
     let isCounterActive = false;
+    let playerLifeTotals = {
+        1: 40,
+        2: 40,
+        3: 40,
+        4: 40
+    };
     
     // Initialize turn counter from form input if it has a value
     if (turnsInput && turnsInput.value) {
@@ -199,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
             turnsInput.dispatchEvent(event);
         }
         
+        // Save life tracking data to hidden inputs
+        saveLifeTrackingData();
+        
         closeTurnCounter();
         
         // Show brief success indication
@@ -253,6 +262,152 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
     
-    // Initialize display
+    // Life Counter Elements and Event Listeners
+    const lifeCounterReset = document.getElementById('lifeCounterReset');
+    const lifeCounterButtons = document.querySelectorAll('.life-counter-btn');
+    
+    // Life counter button event listeners
+    lifeCounterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const player = parseInt(this.dataset.player);
+            const action = this.dataset.action;
+            
+            if (action === 'increment') {
+                incrementLife(player);
+            } else if (action === 'decrement') {
+                decrementLife(player);
+            }
+        });
+        
+        // Add touch events for better mobile response
+        button.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            const player = parseInt(this.dataset.player);
+            const action = this.dataset.action;
+            
+            if (action === 'increment') {
+                incrementLife(player);
+            } else if (action === 'decrement') {
+                decrementLife(player);
+            }
+        });
+    });
+    
+    // Life counter reset
+    if (lifeCounterReset) {
+        lifeCounterReset.addEventListener('click', function() {
+            resetLife();
+        });
+    }
+    
+    // Life Counter Functions
+    function incrementLife(player) {
+        playerLifeTotals[player]++;
+        updateLifeDisplay(player);
+        animateLifeButton(player, 'increment');
+        
+        // Haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate(30);
+        }
+    }
+    
+    function decrementLife(player) {
+        playerLifeTotals[player]--;
+        updateLifeDisplay(player);
+        animateLifeButton(player, 'decrement');
+        
+        // Haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate(30);
+        }
+    }
+    
+    function resetLife() {
+        playerLifeTotals = {
+            1: 40,
+            2: 40,
+            3: 40,
+            4: 40
+        };
+        
+        updateAllLifeDisplays();
+        
+        // Haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate([50, 50, 50]);
+        }
+    }
+    
+    function updateLifeDisplay(player) {
+        const lifeElement = document.getElementById(`player${player}Life`);
+        const playerElement = document.querySelector(`.life-counter-player[data-player="${player}"]`);
+        
+        if (lifeElement && playerElement) {
+            const life = playerLifeTotals[player];
+            lifeElement.textContent = life;
+            
+            // Update styling based on life total
+            lifeElement.classList.remove('life-counter-player-life--low', 'life-counter-player-life--dead');
+            playerElement.classList.remove('life-counter-player--dead');
+            
+            if (life <= 0) {
+                lifeElement.classList.add('life-counter-player-life--dead');
+                playerElement.classList.add('life-counter-player--dead');
+            } else if (life <= 10) {
+                lifeElement.classList.add('life-counter-player-life--low');
+            }
+        }
+        
+        // Update the hidden form inputs in real-time
+        const input = document.getElementById(`player${player}FinalLife`);
+        if (input) {
+            input.value = playerLifeTotals[player];
+        }
+    }
+    
+    function updateAllLifeDisplays() {
+        for (let player = 1; player <= 4; player++) {
+            updateLifeDisplay(player);
+        }
+    }
+    
+    function animateLifeButton(player, action) {
+        const button = document.querySelector(`.life-counter-btn[data-player="${player}"][data-action="${action}"]`);
+        if (button) {
+            const className = `life-counter-btn--${action}-active`;
+            button.classList.add(className);
+            
+            setTimeout(() => {
+                button.classList.remove(className);
+            }, 150);
+        }
+    }
+    
+    function getLifeTrackingData() {
+        return {
+            finalLifeTotals: { ...playerLifeTotals },
+            gameCompleted: Object.values(playerLifeTotals).filter(life => life <= 0).length >= 3
+        };
+    }
+    
+    function saveLifeTrackingData() {
+        // Save individual life totals to hidden inputs
+        for (let player = 1; player <= 4; player++) {
+            const input = document.getElementById(`player${player}FinalLife`);
+            if (input) {
+                input.value = playerLifeTotals[player];
+            }
+        }
+        
+        // Save complete life tracking data as JSON
+        const lifeDataInput = document.getElementById('lifeTrackingData');
+        if (lifeDataInput) {
+            lifeDataInput.value = JSON.stringify(getLifeTrackingData());
+        }
+    }
+    
+    // Initialize displays
     updateDisplay();
+    updateAllLifeDisplays();
 });
