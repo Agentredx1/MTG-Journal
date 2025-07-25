@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (action === 'decrement') {
                         decrementLifeFast(player);
                     }
-                }, 150); // Every 150ms for fast increment
+                }, 500); // Every 150ms for fast increment
             }, 500); // Wait 500ms before starting fast increment
         }
         
