@@ -23,7 +23,7 @@
           <a href="{{ url_for('index') }}" class="btn btn--primary">Home</a>
           <a href="{{ url_for('stats') }}" class="btn btn--secondary">View Stats</a>
           {% if session.logged_in %}
-          <a href="{{ url_for('add_game_form') }}" class="btn btn--secondary">Add Game Data</a>
+          <a href="{{ url_for('add_game_form') }}" class="btn btn--secondary">Add Game</a>
           <a href="{{ url_for('logout') }}" class="btn btn--secondary">Logout</a>
           {% else %}
           <a href="{{ url_for('login') }}" class="btn btn--secondary">Login</a>
