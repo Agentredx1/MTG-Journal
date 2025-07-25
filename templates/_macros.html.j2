@@ -2,17 +2,17 @@
 {% macro color_table(color_stats) %}
 <div class="color-analysis">
   {% for color_data in color_stats %}
-    <div class="color-bar">
-      <div class="color-bar__fill color-bar__fill--{{ color_data.color_name|lower }}" 
-           style="width: {{ color_data.percentage }}%">
-      </div>
-      <div class="color-bar__text">
-        {{ color_data.color_name }}: {{ color_data.count }} ({{ color_data.percentage }}%)
-      </div>
-      {% if color_data.pip_url %}
-        <img src="{{ color_data.pip_url }}" alt="{{ color_data.color_name }} mana" class="color-bar__pip">
-      {% endif %}
+  <div class="color-bar">
+    <div class="color-bar__fill color-bar__fill--{{ color_data.color_name|lower }}"
+      style="width: {{ color_data.percentage }}%">
     </div>
+    <div class="color-bar__text">
+      {{ color_data.color_name }}: {{ color_data.count }} ({{ color_data.percentage }}%)
+    </div>
+    {% if color_data.pip_url %}
+    <img src="{{ color_data.pip_url }}" alt="{{ color_data.color_name }} mana" class="color-bar__pip">
+    {% endif %}
+  </div>
   {% endfor %}
 </div>
 {% endmacro %}
@@ -22,9 +22,9 @@
   <thead>
     <tr>
       <th class="table__header">Commander</th>
-      <th class="table__header">Games Played</th>
+      <th class="table__header">Games</th>
       <th class="table__header">Wins</th>
-      <th class="table__header">Win Rate (%)</th>
+      <th class="table__header">WR</th>
     </tr>
   </thead>
   <tbody>
@@ -32,14 +32,14 @@
     <tr class="table__row">
       <td class="table__cell">
         {% if clickable %}
-          <a href="#" class="link" data-commander="{{ commander.name }}">{{ commander.name }}</a>
+        <a href="#" class="link" data-commander="{{ commander.name }}">{{ commander.name }}</a>
         {% else %}
-          {{ commander.name }}
+        {{ commander.name }}
         {% endif %}
       </td>
       <td class="table__cell">{{ commander.games_played }}</td>
       <td class="table__cell">{{ commander.wins }}</td>
-      <td class="table__cell">{{ commander.win_rate }}</td>
+      <td class="table__cell">{{ commander.win_rate|int }}%</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -53,11 +53,11 @@
       <button class="modal__close" id="{{ modal_id }}Close" aria-label="Close modal">
         <span>&times;</span>
       </button>
-      
+
       <div class="modal__image-container">
         <img class="modal__content" id="{{ modal_id }}Image" alt="Commander card">
       </div>
-      
+
       <div class="modal__actions">
         <a id="{{ modal_id }}LinkScryfall" class="btn btn--primary modal__btn" href="#" target="_blank">
           <span class="modal__btn-text">View on Scryfall</span>
@@ -70,4 +70,3 @@
   </div>
 </div>
 {% endmacro %}
-

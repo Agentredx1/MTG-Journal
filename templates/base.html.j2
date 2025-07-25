@@ -1,13 +1,14 @@
-
 <!-- base.html.j2 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <title>{% block title %}MTG Tracker{% endblock %}</title>
 </head>
+
 <body>
   <div class="container">
     <nav class="nav">
@@ -16,23 +17,23 @@
         <span class="nav__hamburger"></span>
         <span class="nav__hamburger"></span>
       </button>
-      
+
       <div class="nav__content" id="nav-content">
         <div class="nav__links">
           <a href="{{ url_for('index') }}" class="btn btn--primary">Home</a>
           <a href="{{ url_for('stats') }}" class="btn btn--secondary">View Stats</a>
           {% if session.logged_in %}
-            <a href="{{ url_for('add_game_form') }}" class="btn btn--secondary">Add Game Data</a>
-            <a href="{{ url_for('logout') }}" class="btn btn--secondary">Logout</a>
+          <a href="{{ url_for('add_game_form') }}" class="btn btn--secondary">Add Game Data</a>
+          <a href="{{ url_for('logout') }}" class="btn btn--secondary">Logout</a>
           {% else %}
-            <a href="{{ url_for('login') }}" class="btn btn--secondary">Login</a>
+          <a href="{{ url_for('login') }}" class="btn btn--secondary">Login</a>
           {% endif %}
         </div>
         {% if session.logged_in %}
-          <div class="nav__group-info">
-            <span class="nav__group-label">Group:</span>
-            <span class="nav__group-name">{{ session.group_name }}</span>
-          </div>
+        <div class="nav__group-info">
+          <span class="nav__group-label">Pod</span>
+          <span class="nav__group-name">{{ session.group_name }}</span>
+        </div>
         {% endif %}
       </div>
     </nav>
@@ -50,12 +51,12 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const navToggle = document.getElementById('nav-toggle');
       const navContent = document.getElementById('nav-content');
-      
+
       if (navToggle && navContent) {
-        navToggle.addEventListener('click', function() {
+        navToggle.addEventListener('click', function () {
           navContent.classList.toggle('nav__content--active');
           navToggle.classList.toggle('nav__toggle--active');
         });
@@ -63,4 +64,5 @@
     });
   </script>
 </body>
+
 </html>
