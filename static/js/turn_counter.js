@@ -266,31 +266,81 @@ document.addEventListener('DOMContentLoaded', function() {
     const lifeCounterReset = document.getElementById('lifeCounterReset');
     const lifeCounterButtons = document.querySelectorAll('.life-counter-btn');
     
+    // Hold-to-increment functionality
+    let holdTimer = null;
+    let holdInterval = null;
+    let isHolding = false;
+    
     // Life counter button event listeners
     lifeCounterButtons.forEach(button => {
+        // Regular click/tap for +1/-1
         button.addEventListener('click', function() {
-            const player = parseInt(this.dataset.player);
-            const action = this.dataset.action;
-            
-            if (action === 'increment') {
-                incrementLife(player);
-            } else if (action === 'decrement') {
-                decrementLife(player);
+            if (!isHolding) {
+                const player = parseInt(this.dataset.player);
+                const action = this.dataset.action;
+                
+                if (action === 'increment') {
+                    incrementLife(player);
+                } else if (action === 'decrement') {
+                    decrementLife(player);
+                }
             }
         });
         
-        // Add touch events for better mobile response
-        button.addEventListener('touchstart', function(e) {
+        // Mouse/touch hold events for +10/-10
+        function startHold(e) {
             e.preventDefault();
-            const player = parseInt(this.dataset.player);
-            const action = this.dataset.action;
+            const player = parseInt(button.dataset.player);
+            const action = button.dataset.action;
+            isHolding = false;
             
-            if (action === 'increment') {
-                incrementLife(player);
-            } else if (action === 'decrement') {
-                decrementLife(player);
+            // Start hold timer - after 500ms, begin fast increment
+            holdTimer = setTimeout(() => {
+                isHolding = true;
+                button.classList.add('life-counter-btn--holding');
+                
+                // Haptic feedback for hold activation
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+                
+                // Start interval for fast increment/decrement
+                holdInterval = setInterval(() => {
+                    if (action === 'increment') {
+                        incrementLifeFast(player);
+                    } else if (action === 'decrement') {
+                        decrementLifeFast(player);
+                    }
+                }, 150); // Every 150ms for fast increment
+            }, 500); // Wait 500ms before starting fast increment
+        }
+        
+        function endHold() {
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
             }
-        });
+            if (holdInterval) {
+                clearInterval(holdInterval);
+                holdInterval = null;
+            }
+            button.classList.remove('life-counter-btn--holding');
+            
+            // Reset holding flag after a short delay to prevent click from firing
+            setTimeout(() => {
+                isHolding = false;
+            }, 50);
+        }
+        
+        // Mouse events
+        button.addEventListener('mousedown', startHold);
+        button.addEventListener('mouseup', endHold);
+        button.addEventListener('mouseleave', endHold);
+        
+        // Touch events
+        button.addEventListener('touchstart', startHold);
+        button.addEventListener('touchend', endHold);
+        button.addEventListener('touchcancel', endHold);
     });
     
     // Life counter reset
@@ -320,6 +370,28 @@ document.addEventListener('DOMContentLoaded', function() {
         // Haptic feedback
         if (navigator.vibrate) {
             navigator.vibrate(30);
+        }
+    }
+    
+    function incrementLifeFast(player) {
+        playerLifeTotals[player] += 10;
+        updateLifeDisplay(player);
+        animateLifeButton(player, 'increment');
+        
+        // Stronger haptic feedback for fast increment
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+    }
+    
+    function decrementLifeFast(player) {
+        playerLifeTotals[player] -= 10;
+        updateLifeDisplay(player);
+        animateLifeButton(player, 'decrement');
+        
+        // Stronger haptic feedback for fast decrement
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
         }
     }
     

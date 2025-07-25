@@ -515,7 +515,7 @@ body {
 
 .turn-counter-display {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .turn-counter-current {
@@ -534,11 +534,11 @@ body {
 }
 
 .turn-counter-number {
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: 700;
   color: #2563eb;
   line-height: 1;
-  min-width: 100px;
+  min-width: 80px;
   display: inline-block;
   transition: all 0.3s ease;
   text-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
@@ -558,7 +558,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .turn-counter-btn {
@@ -1158,7 +1158,7 @@ body {
   }
   
   .turn-counter-number {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
   
   .turn-counter-controls {
@@ -1540,10 +1540,10 @@ body {
 }
 
 .life-counter-player-life {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #059669;
-  min-width: 3rem;
+  min-width: 3.5rem;
 }
 
 .life-counter-player-life--low {
@@ -1564,8 +1564,8 @@ body {
   background-color: #f3f4f6;
   border: 2px solid #d1d5db;
   border-radius: 0.5rem;
-  width: 3rem;
-  height: 3rem;
+  width: 3.5rem;
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1625,6 +1625,11 @@ body {
   transform: scale(0.95);
 }
 
+.life-counter-btn--holding {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  transform: scale(1.05);
+}
+
 /* Mobile responsive for life counter */
 @media (max-width: 768px) {
   .life-counter-players {
@@ -1637,12 +1642,12 @@ body {
   }
   
   .life-counter-player-life {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
   
   .life-counter-btn {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
   }
   
   .life-counter-btn-icon {
