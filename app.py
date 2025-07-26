@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
-from queries import get_player_win_rates, get_player_win_rates_filtered, get_commander_stats, get_commander_stats_filtered, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case, get_group_by_passkey, insert_game_with_group, insert_player_with_game, update_game_winner, get_commander_suggestions
+from queries import get_player_win_rates, get_player_win_rates_filtered, get_commander_stats, get_commander_stats_filtered, get_player_detail_stats, get_player_commanders, get_player_color_stats, get_overall_color_stats, get_longest_win_streak, get_top_win_rate, get_recent_commanders, to_kebab_case, get_group_by_passkey, insert_game_with_group, insert_player_with_game, update_game_winner, get_commander_suggestions, sanitize_input
 from functools import wraps
 import sqlite3
 import os
@@ -9,18 +9,26 @@ import csv
 import io
 from werkzeug.utils import secure_filename
 
+# Try to import flask-cors, fallback gracefully if not available
+try:
+    from flask_cors import CORS
+    CORS_AVAILABLE = True
+except ImportError:
+    CORS_AVAILABLE = False
+    print("Warning: flask-cors not installed. CORS support disabled.")
+
+# Import API blueprint
+from api import api
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key') # This signs the sessions but really doesn't matter atm
 
-def sanitize_input(text):
-    """Sanitize user input by removing HTML tags and trimming whitespace"""
-    if not text:
-        return ""
-    # Remove HTML tags and decode HTML entities
-    text = html.escape(text.strip())
-    # Remove extra whitespace
-    text = re.sub(r'\s+', ' ', text)
-    return text
+# Enable CORS if available
+if CORS_AVAILABLE:
+    CORS(app, supports_credentials=True, origins=['http://localhost:5173', 'http://127.0.0.1:5173'])
+
+# Register API blueprint
+app.register_blueprint(api)
 
 def login_required(f):
     @wraps(f)

@@ -1,8 +1,19 @@
 import sqlite3
 import os
 import re
+import html
 from collections import Counter
 from typing import List, Dict, Optional, Tuple, Any
+
+def sanitize_input(text):
+    """Sanitize user input by removing HTML tags and trimming whitespace"""
+    if not text:
+        return ""
+    # Remove HTML tags and decode HTML entities
+    text = html.escape(text.strip())
+    # Remove extra whitespace
+    text = re.sub(r'\s+', ' ', text)
+    return text
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "mtg.db")
