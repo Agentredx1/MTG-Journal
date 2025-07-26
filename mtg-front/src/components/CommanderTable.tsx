@@ -1,0 +1,60 @@
+import React from 'react';
+import { CommanderData, CommanderTableProps } from '../types';
+
+const CommanderTable: React.FC<CommanderTableProps> = ({ 
+  commanders, 
+  clickable = false, 
+  onCommanderClick 
+}) => {
+  if (!commanders || commanders.length === 0) {
+    return (
+      <div className="table-container">
+        <div className="no-data">No commander data available</div>
+      </div>
+    );
+  }
+
+  const handleCommanderClick = (commanderName: string) => {
+    if (clickable && onCommanderClick) {
+      onCommanderClick(commanderName);
+    }
+  };
+
+  return (
+    <div className="table-container">
+      <table className="table">
+        <thead>
+          <tr>
+            <th className="table__header">Commander</th>
+            <th className="table__header">Games Played</th>
+            <th className="table__header">Wins</th>
+            <th className="table__header">Win Rate (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {commanders.map((commander, index) => (
+            <tr key={index} className="table__row">
+              <td className="table__cell">
+                {clickable ? (
+                  <span 
+                    className="commander-link"
+                    onClick={() => handleCommanderClick(commander.name)}
+                  >
+                    {commander.name}
+                  </span>
+                ) : (
+                  commander.name
+                )}
+              </td>
+              <td className="table__cell">{commander.games_played}</td>
+              <td className="table__cell">{commander.wins}</td>
+              <td className="table__cell">{commander.win_rate.toFixed(1)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default CommanderTable;

@@ -23,12 +23,38 @@ from api import api
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key') # This signs the sessions but really doesn't matter atm
 
+# DEVELOPMENT MODE: Disable CORS entirely for simpler development
 # Enable CORS if available
 if CORS_AVAILABLE:
-    CORS(app, supports_credentials=True, origins=['http://localhost:5173', 'http://127.0.0.1:5173'])
+    # Development mode - allow all origins and methods
+    CORS(app, 
+         supports_credentials=False,  # Disabled since we're not using sessions in dev mode
+         origins='*',  # Allow all origins for development
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         allow_headers=['Content-Type'])
+    print("CORS enabled for development mode (all origins allowed)")
+else:
+    print("CORS not available - you may need to install flask-cors")
 
 # Register API blueprint
 app.register_blueprint(api)
+
+# Development mode: Add manual CORS headers if flask-cors is not available
+if not CORS_AVAILABLE:
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        return response
+
+    @app.route('/api/v1/<path:path>', methods=['OPTIONS'])
+    def handle_options(path):
+        response = jsonify({'status': 'ok'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        return response
 
 def login_required(f):
     @wraps(f)

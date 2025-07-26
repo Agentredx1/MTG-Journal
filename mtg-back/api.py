@@ -13,10 +13,22 @@ import traceback
 # Create API blueprint
 api = Blueprint('api', __name__, url_prefix='/api/v1')
 
+# DEVELOPMENT MODE: Default group ID (comment out for production)
+DEVELOPMENT_MODE = True
+DEFAULT_GROUP_ID = 1
+
 def api_login_required(f):
     """Decorator for API endpoints that require authentication"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # DEVELOPMENT MODE: Skip authentication and use default group
+        if DEVELOPMENT_MODE:
+            session['logged_in'] = True
+            session['group_id'] = DEFAULT_GROUP_ID
+            session['group_name'] = 'Default Group'
+            return f(*args, **kwargs)
+        
+        # Production authentication (commented out for development)
         if 'logged_in' not in session or 'group_id' not in session:
             return jsonify({'error': 'Authentication required', 'code': 'AUTH_REQUIRED'}), 401
         return f(*args, **kwargs)
@@ -24,6 +36,9 @@ def api_login_required(f):
 
 def get_current_group_id():
     """Helper function to get the current user's group ID from session"""
+    # DEVELOPMENT MODE: Always return default group ID
+    if DEVELOPMENT_MODE:
+        return DEFAULT_GROUP_ID
     return session.get('group_id')
 
 def error_response(message: str, code: str = 'ERROR', status_code: int = 400):
