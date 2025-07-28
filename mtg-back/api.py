@@ -124,7 +124,7 @@ def dashboard():
         king = get_top_win_rate(group_id=group_id)
         king_commanders = []
         if king:
-            king_imgs = get_recent_commanders(king["player_name"], group_id=group_id)
+            king_imgs = get_recent_commanders(king["name"], group_id=group_id)
             king_commanders = [
                 {
                     "name": c["name"],

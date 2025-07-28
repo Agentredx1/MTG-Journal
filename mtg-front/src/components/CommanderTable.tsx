@@ -1,5 +1,5 @@
 import React from 'react';
-import { CommanderData, CommanderTableProps } from '../types';
+import type { CommanderTableProps } from '../types';
 
 const CommanderTable: React.FC<CommanderTableProps> = ({ 
   commanders, 
@@ -34,7 +34,7 @@ const CommanderTable: React.FC<CommanderTableProps> = ({
         <tbody>
           {commanders.map((commander, index) => (
             <tr key={index} className="table__row">
-              <td className="table__cell">
+              <td className="table__cell" data-label="Commander">
                 {clickable ? (
                   <span 
                     className="commander-link"
@@ -46,9 +46,9 @@ const CommanderTable: React.FC<CommanderTableProps> = ({
                   commander.name
                 )}
               </td>
-              <td className="table__cell">{commander.games_played}</td>
-              <td className="table__cell">{commander.wins}</td>
-              <td className="table__cell">{commander.win_rate.toFixed(1)}</td>
+              <td className="table__cell" data-label="Games Played">{commander.games_played}</td>
+              <td className="table__cell" data-label="Wins">{commander.wins}</td>
+              <td className="table__cell" data-label="Win Rate (%)">{commander.win_rate.toFixed(1)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CommanderModalProps } from '../types';
+import type { CommanderModalProps } from '../types';
 
 const CommanderModal: React.FC<CommanderModalProps> = ({ 
   commanderName, 

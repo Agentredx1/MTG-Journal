@@ -51,7 +51,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <div style={{ position: 'relative' }}>
+      <div className="app-container">
         <Navigation 
           currentPage={currentPage} 
           onPageChange={handlePageChange}

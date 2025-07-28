@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
-import { StatsData, PlayerStats } from '../types';
+import type { StatsData } from '../types';
 import CommanderTable from '../components/CommanderTable';
 import ColorTable from '../components/ColorTable';
 import CommanderModal from '../components/CommanderModal';
@@ -9,6 +9,7 @@ import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
 import { useCommanderModal } from '../hooks/useCommanderModal';
 import { SECTION_CLASSES, HEADER_CLASSES } from '../constants/styles';
+import '../App.css';
 
 export interface StatsProps {
   onPlayerClick?: (playerName: string) => void;
@@ -38,7 +39,7 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
       const response = await apiService.getStats();
       
       if (response.success && response.data) {
-        setStatsData(response.data);
+        setStatsData(response.data as StatsData);
       } else {
         setError('Failed to load statistics data');
       }
@@ -94,9 +95,9 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
               <thead>
                 <tr>
                   <th className="table__header">Player Name</th>
-                  <th className="table__header">Games Played</th>
+                  <th className="table__header">Games</th>
                   <th className="table__header">Wins</th>
-                  <th className="table__header">Win Rate (%)</th>
+                  <th className="table__header">Win Rate</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,7 +106,7 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
                     <td className="table__cell" data-label="Player Name">
                       <span 
                         className="player-link"
-                        onClick={() => handlePlayerClick(player.player_name)}
+                        onClick={() => handlePlayerClick(player.player_name || '')}
                       >
                         {player.player_name}
                       </span>
@@ -116,8 +117,8 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
                     <td className="table__cell" data-label="Wins">
                       {player.wins}
                     </td>
-                    <td className="table__cell" data-label="Win Rate (%)">
-                      {player.win_rate.toFixed(1)}
+                    <td className="table__cell" data-label="Win Rate">
+                      {player.win_rate.toFixed(1)}%
                     </td>
                   </tr>
                 ))}

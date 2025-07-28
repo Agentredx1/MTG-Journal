@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { apiService, DashboardData } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
 import CommanderModal from './CommanderModal';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
@@ -10,7 +9,6 @@ const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { groupInfo } = useAuth();  // Development mode - using groupInfo instead of authStatus
   
   // Commander modal state using shared hook
   const {
@@ -67,21 +65,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>MTG Journal</h1>
-          <div className="header-info">
-            <span className="group-name">
-              {groupInfo?.group_name || 'Default Group'}
-            </span>
-            {/* Development mode - logout button commented out */}
-            {/* <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button> */}
-          </div>
-        </div>
-      </header>
-
       <main className="dashboard-main">
         {/* King Section */}
         <section className="king-section">
@@ -89,7 +72,7 @@ const Dashboard: React.FC = () => {
           {dashboardData?.king ? (
             <div className="king-card">
               <div className="king-info">
-                <h3>{dashboardData.king.player_name}</h3>
+                <h3>{dashboardData.king.name}</h3>
                 <div className="king-stats">
                   <span className="win-rate">{dashboardData.king.win_rate}% Win Rate</span>
                   <span className="game-count">

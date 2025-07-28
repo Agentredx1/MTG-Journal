@@ -97,7 +97,7 @@ def logout():
 def index():
     group_id = get_current_group_id()
     king = get_top_win_rate(group_id=group_id)
-    king_imgs = get_recent_commanders(king["player_name"], group_id=group_id) if king else []
+    king_imgs = get_recent_commanders(king["name"], group_id=group_id) if king else []
     villains_raw = get_longest_win_streak(group_id=group_id)
     villains = []
     for v in villains_raw:
