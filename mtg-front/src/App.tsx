@@ -55,7 +55,7 @@ function App() {
         <Navigation 
           currentPage={currentPage} 
           onPageChange={handlePageChange}
-          showNavigation={currentPage !== 'player-detail'}
+          showNavigation={true}
         />
         
         {renderCurrentPage()}

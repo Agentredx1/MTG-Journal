@@ -86,18 +86,18 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
   }
 
   return (
-    <Layout title="MTG Stats" className="stats-container">
+    <Layout title="" className="stats-container">
       {/* Player Stats Section */}
       <section className={SECTION_CLASSES.stats}>
-        <h2 className={HEADER_CLASSES.secondary}>Player Win Rates</h2>
+        <h2 className={HEADER_CLASSES.secondary}>Players</h2>
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th className="table__header">Player Name</th>
+                  <th className="table__header">Player</th>
                   <th className="table__header">Games</th>
                   <th className="table__header">Wins</th>
-                  <th className="table__header">Win Rate</th>
+                  <th className="table__header">WR</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,7 +129,7 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
 
       {/* Commander Stats Section */}
       <section className={SECTION_CLASSES.stats}>
-        <h2 className={HEADER_CLASSES.secondary}>Commander Usage</h2>
+        <h2 className={HEADER_CLASSES.secondary}>Commanders</h2>
           <CommanderTable 
             commanders={statsData.commander_stats}
             clickable={true}
@@ -139,7 +139,7 @@ const Stats: React.FC<StatsProps> = ({ onPlayerClick }) => {
 
       {/* Color Distribution Section */}
       <section className={SECTION_CLASSES.stats}>
-        <h2 className={HEADER_CLASSES.secondary}>Overall Color Distribution</h2>
+        <h2 className={HEADER_CLASSES.secondary}>Color Distribution</h2>
           <ColorTable colorStats={statsData.color_stats} />
       </section>
 

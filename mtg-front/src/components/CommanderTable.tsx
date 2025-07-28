@@ -28,7 +28,7 @@ const CommanderTable: React.FC<CommanderTableProps> = ({
             <th className="table__header">Commander</th>
             <th className="table__header">Games Played</th>
             <th className="table__header">Wins</th>
-            <th className="table__header">Win Rate (%)</th>
+            <th className="table__header">WR</th>
           </tr>
         </thead>
         <tbody>

@@ -160,12 +160,6 @@ const Dashboard: React.FC = () => {
         <section className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="action-buttons">
-            <button 
-              className="action-button"
-              onClick={() => window.open('/stats', '_blank')}
-            >
-              📊 View Statistics
-            </button>
             <button className="action-button">
               ➕ Add New Game
             </button>
